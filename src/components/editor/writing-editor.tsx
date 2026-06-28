@@ -1,29 +1,39 @@
 "use client";
 
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+
 import { EditorToolbar } from "@/components/editor/editor-toolbar";
-import { WritingTimeline } from "@/components/editor/writing-timeline";
-import { useWritingEvents } from "@/hooks/use-writing-events";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-type WritingEditorProps = {
-  documentId: string;
-};
+const editorContentClass = cn(
+  "min-h-[500px] w-full bg-background px-8 py-6 text-base leading-relaxed outline-none",
+  "[&_h2]:mb-3 [&_h2]:mt-6 [&_h2]:text-xl [&_h2]:font-semibold",
+  "[&_p]:mb-3",
+  "[&_ul]:mb-3 [&_ul]:list-disc [&_ul]:pl-6",
+);
 
-export function WritingEditor({ documentId }: WritingEditorProps) {
-  const { events } = useWritingEvents(documentId);
+export function WritingEditor() {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: "<p>Start writing your draft here...</p>",
+    immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        class: editorContentClass,
+      },
+    },
+  });
 
   return (
-    <div className="flex h-full flex-col rounded-lg border border-border">
-      <EditorToolbar />
-      <div className="flex flex-1">
-        <div className="flex-1 p-4">
-          <textarea
-            className="h-full min-h-96 w-full resize-none bg-transparent outline-none"
-            placeholder="Start writing..."
-            readOnly
-          />
+    <Card className="overflow-hidden">
+      <EditorToolbar editor={editor} />
+      <CardContent className="p-0">
+        <div className="mx-auto max-w-3xl">
+          <EditorContent editor={editor} />
         </div>
-        <WritingTimeline events={events} />
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
