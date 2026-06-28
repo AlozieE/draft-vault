@@ -1,20 +1,36 @@
-import type { WritingEvent, WritingEventType } from "@/types/writing-event";
+import { GENESIS_HASH } from "@/lib/constants";
+import { createEventHash } from "@/lib/hash-chain";
+import type { WritingEvent, WritingEventInput } from "@/types/writing-event";
 
-type CreateWritingEventParams = {
-  documentId: string;
-  type: WritingEventType;
-  contentLengthChange: number;
-  wordCount: number;
-  characterCount: number;
-  textPreview?: string;
+export type CreateWritingEventInput = WritingEventInput & {
+  previousHash?: string;
 };
 
-export function createWritingEvent(
-  params: CreateWritingEventParams,
-): WritingEvent {
-  return {
+export async function createWritingEvent({
+  documentId,
+  type,
+  contentLengthChange,
+  wordCount,
+  characterCount,
+  textPreview,
+  previousHash = GENESIS_HASH,
+}: CreateWritingEventInput): Promise<WritingEvent> {
+  const eventData = {
     id: crypto.randomUUID(),
+    documentId,
+    type,
     timestamp: new Date().toISOString(),
-    ...params,
+    contentLengthChange,
+    wordCount,
+    characterCount,
+    ...(textPreview !== undefined ? { textPreview } : {}),
+  };
+
+  const eventHash = await createEventHash(eventData, previousHash);
+
+  return {
+    ...eventData,
+    previousHash,
+    eventHash,
   };
 }

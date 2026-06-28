@@ -1,8 +1,11 @@
 "use client";
 
+import { useCallback } from "react";
+
 import { WritingEditor } from "@/components/editor/writing-editor";
 import { WritingTimeline } from "@/components/editor/writing-timeline";
 import { useWritingEvents } from "@/hooks/use-writing-events";
+import type { WritingEventInput } from "@/types/writing-event";
 
 type DocumentEditorWorkspaceProps = {
   documentId: string;
@@ -12,7 +15,14 @@ export function DocumentEditorWorkspace({
   documentId,
 }: DocumentEditorWorkspaceProps) {
   const resolvedDocumentId = documentId || "demo";
-  const { events, addEvent } = useWritingEvents();
+  const { events, addWritingEvent, chainIsValid } = useWritingEvents();
+
+  const handleWritingEvent = useCallback(
+    (input: WritingEventInput) => {
+      addWritingEvent(input);
+    },
+    [addWritingEvent],
+  );
 
   return (
     <div className="space-y-6">
@@ -26,9 +36,9 @@ export function DocumentEditorWorkspace({
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <WritingEditor
           documentId={resolvedDocumentId}
-          onWritingEvent={addEvent}
+          onWritingEvent={handleWritingEvent}
         />
-        <WritingTimeline events={events} />
+        <WritingTimeline events={events} chainIsValid={chainIsValid} />
       </div>
     </div>
   );

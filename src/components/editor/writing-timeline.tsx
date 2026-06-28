@@ -11,6 +11,7 @@ import type { WritingEvent } from "@/types/writing-event";
 
 type WritingTimelineProps = {
   events: WritingEvent[];
+  chainIsValid: boolean;
 };
 
 function formatLocalTime(timestamp: string): string {
@@ -29,12 +30,23 @@ function formatContentLengthChange(change: number): string {
   return String(change);
 }
 
-export function WritingTimeline({ events }: WritingTimelineProps) {
+function shortenEventHash(eventHash: string): string {
+  return eventHash.slice(0, 10);
+}
+
+export function WritingTimeline({ events, chainIsValid }: WritingTimelineProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Writing Timeline</CardTitle>
-        <CardDescription>Recent events for this session</CardDescription>
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <CardTitle>Writing Timeline</CardTitle>
+            <CardDescription>Recent events for this session</CardDescription>
+          </div>
+          <Badge variant={chainIsValid ? "secondary" : "destructive"}>
+            {chainIsValid ? "Verification passed" : "Verification failed"}
+          </Badge>
+        </div>
       </CardHeader>
       <CardContent>
         {events.length === 0 ? (
@@ -47,16 +59,19 @@ export function WritingTimeline({ events }: WritingTimelineProps) {
               <li key={event.id}>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <Badge variant="secondary">{event.type}</Badge>
+                    <Badge variant="outline">{event.type}</Badge>
                     <span className="text-xs text-muted-foreground">
                       {formatLocalTime(event.timestamp)}
                     </span>
                   </div>
-                  <div className="flex gap-4 text-xs text-muted-foreground">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                     <span>
                       Change: {formatContentLengthChange(event.contentLengthChange)}
                     </span>
                     <span>Words: {event.wordCount}</span>
+                    <span className="font-mono">
+                      Hash: {shortenEventHash(event.eventHash)}
+                    </span>
                   </div>
                 </div>
                 {index < events.length - 1 && <Separator className="mt-4" />}

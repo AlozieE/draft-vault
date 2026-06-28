@@ -7,9 +7,8 @@ import { useRef } from "react";
 
 import { EditorToolbar } from "@/components/editor/editor-toolbar";
 import { Card, CardContent } from "@/components/ui/card";
-import { createWritingEvent } from "@/lib/writing-event-factory";
 import { cn } from "@/lib/utils";
-import type { WritingEvent, WritingEventType } from "@/types/writing-event";
+import type { WritingEventInput, WritingEventType } from "@/types/writing-event";
 
 const editorContentClass = cn(
   "min-h-[500px] w-full bg-background px-8 py-6 text-base leading-relaxed outline-none",
@@ -20,7 +19,7 @@ const editorContentClass = cn(
 
 type WritingEditorProps = {
   documentId: string;
-  onWritingEvent?: (event: WritingEvent) => void;
+  onWritingEvent?: (input: WritingEventInput) => void;
 };
 
 function countWords(text: string): number {
@@ -61,7 +60,7 @@ export function WritingEditor({
 
     previousLengthRef.current = characterCount;
 
-    const event = createWritingEvent({
+    onWritingEventRef.current?.({
       documentId,
       type: resolveEventType(contentLengthChange),
       contentLengthChange,
@@ -69,8 +68,6 @@ export function WritingEditor({
       characterCount,
       textPreview: text.slice(-80) || undefined,
     });
-
-    onWritingEventRef.current?.(event);
   };
 
   const editor = useEditor({
