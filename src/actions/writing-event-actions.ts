@@ -1,7 +1,10 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { mapWritingEvent } from "@/lib/db-mappers";
+import {
+  mapWritingEventRecordToWritingEvent,
+  mapWritingEventRecordsToWritingEvents,
+} from "@/lib/writing-event-mapper";
 import type { WritingEvent, WritingEventType } from "@/types/writing-event";
 
 export type CreateWritingEventRecordInput = {
@@ -24,7 +27,7 @@ export async function getWritingEvents(
     orderBy: { timestamp: "asc" },
   });
 
-  return events.map(mapWritingEvent);
+  return mapWritingEventRecordsToWritingEvents(events);
 }
 
 export async function createWritingEventRecord(
@@ -44,7 +47,7 @@ export async function createWritingEventRecord(
     },
   });
 
-  return mapWritingEvent(event);
+  return mapWritingEventRecordToWritingEvent(event);
 }
 
 export async function clearWritingEvents(documentId: string): Promise<void> {
