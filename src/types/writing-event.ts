@@ -1,11 +1,12 @@
-export type WritingEventType = "insert" | "delete" | "replace";
+export type WritingEventType = "insert" | "delete" | "paste" | "snapshot";
 
 export interface WritingEvent {
   id: string;
   documentId: string;
   type: WritingEventType;
-  timestamp: number;
-  content?: string;
-  previousHash: string;
-  hash: string;
+  timestamp: string;
+  contentLengthChange: number;
+  wordCount: number;
+  characterCount: number;
+  textPreview?: string;
 }
