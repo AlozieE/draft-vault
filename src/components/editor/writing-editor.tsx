@@ -10,6 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { WritingEventInput, WritingEventType } from "@/types/writing-event";
 
+const defaultContent = "<p>Start writing your draft here...</p>";
+
 const editorContentClass = cn(
   "min-h-[500px] w-full bg-background px-8 py-6 text-base leading-relaxed outline-none",
   "[&_h2]:mb-3 [&_h2]:mt-6 [&_h2]:text-xl [&_h2]:font-semibold",
@@ -19,7 +21,9 @@ const editorContentClass = cn(
 
 type WritingEditorProps = {
   documentId: string;
+  initialContent?: string;
   onWritingEvent?: (input: WritingEventInput) => void;
+  onContentChange?: (content: string) => void;
 };
 
 function countWords(text: string): number {
@@ -45,12 +49,16 @@ function resolveEventType(contentLengthChange: number): WritingEventType {
 
 export function WritingEditor({
   documentId,
+  initialContent = defaultContent,
   onWritingEvent,
+  onContentChange,
 }: WritingEditorProps) {
   const previousLengthRef = useRef<number | null>(null);
   const onWritingEventRef = useRef(onWritingEvent);
+  const onContentChangeRef = useRef(onContentChange);
 
   onWritingEventRef.current = onWritingEvent;
+  onContentChangeRef.current = onContentChange;
 
   const handleUpdate = (editor: Editor) => {
     const text = editor.getText();
@@ -59,6 +67,8 @@ export function WritingEditor({
     const contentLengthChange = characterCount - previousLength;
 
     previousLengthRef.current = characterCount;
+
+    onContentChangeRef.current?.(editor.getHTML());
 
     onWritingEventRef.current?.({
       documentId,
@@ -72,7 +82,7 @@ export function WritingEditor({
 
   const editor = useEditor({
     extensions: [StarterKit],
-    content: "<p>Start writing your draft here...</p>",
+    content: initialContent || defaultContent,
     immediatelyRender: false,
     editorProps: {
       attributes: {

@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,6 +13,8 @@ import type { WritingEvent } from "@/types/writing-event";
 type WritingTimelineProps = {
   events: WritingEvent[];
   chainIsValid: boolean;
+  isLoading?: boolean;
+  onClear?: () => void;
 };
 
 function formatLocalTime(timestamp: string): string {
@@ -34,7 +37,12 @@ function shortenEventHash(eventHash: string): string {
   return eventHash.slice(0, 10);
 }
 
-export function WritingTimeline({ events, chainIsValid }: WritingTimelineProps) {
+export function WritingTimeline({
+  events,
+  chainIsValid,
+  isLoading = false,
+  onClear,
+}: WritingTimelineProps) {
   return (
     <Card>
       <CardHeader>
@@ -47,9 +55,22 @@ export function WritingTimeline({ events, chainIsValid }: WritingTimelineProps) 
             {chainIsValid ? "Verification passed" : "Verification failed"}
           </Badge>
         </div>
+        {onClear ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onClear}
+            disabled={isLoading || events.length === 0}
+          >
+            Clear timeline
+          </Button>
+        ) : null}
       </CardHeader>
       <CardContent>
-        {events.length === 0 ? (
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground">Loading timeline...</p>
+        ) : events.length === 0 ? (
           <p className="text-sm text-muted-foreground">
             Start writing to record your drafting timeline.
           </p>

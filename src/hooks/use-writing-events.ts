@@ -7,22 +7,31 @@ import { verifyEventChain } from "@/lib/hash-chain";
 import { createWritingEvent } from "@/lib/writing-event-factory";
 import type { WritingEvent, WritingEventInput } from "@/types/writing-event";
 
-export function useWritingEvents() {
-  const [events, setEvents] = useState<WritingEvent[]>([]);
+export function useWritingEvents(initialEvents: WritingEvent[] = []) {
+  const [events, setEvents] = useState<WritingEvent[]>(initialEvents);
   const [chainIsValid, setChainIsValid] = useState(true);
-  const eventsRef = useRef<WritingEvent[]>([]);
+  const eventsRef = useRef<WritingEvent[]>(initialEvents);
   const chainQueueRef = useRef(Promise.resolve());
 
   useEffect(() => {
     eventsRef.current = events;
   }, [events]);
 
+  useEffect(() => {
+    eventsRef.current = initialEvents;
+    setEvents(initialEvents);
+    void verifyEventChain(initialEvents).then(setChainIsValid);
+  }, [initialEvents]);
+
   const addWritingEvent = useCallback((input: WritingEventInput) => {
     chainQueueRef.current = chainQueueRef.current
       .then(async () => {
         const latestEvent = eventsRef.current.at(-1);
         const previousHash = latestEvent?.eventHash ?? GENESIS_HASH;
-        const event = await createWritingEvent({ ...input, previousHash });
+        const event = await createWritingEvent({
+          ...input,
+          previousHash,
+        });
         const nextEvents = [...eventsRef.current, event];
         const isValid = await verifyEventChain(nextEvents);
 
