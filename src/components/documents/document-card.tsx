@@ -1,21 +1,45 @@
 import Link from "next/link";
 
-import type { Document } from "@/types/document";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 type DocumentCardProps = {
-  document: Document;
+  title: string;
+  status: string;
+  updatedAt: string;
+  href: string;
 };
 
-export function DocumentCard({ document }: DocumentCardProps) {
+export function DocumentCard({
+  title,
+  status,
+  updatedAt,
+  href,
+}: DocumentCardProps) {
   return (
-    <Link
-      href={`/documents/${document.id}`}
-      className="block rounded-lg border border-border p-4 transition-colors hover:bg-muted"
-    >
-      <h3 className="font-medium">{document.title}</h3>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Updated {document.updatedAt}
-      </p>
-    </Link>
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+        <CardAction>
+          <Badge variant="secondary">{status}</Badge>
+        </CardAction>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-muted-foreground">Updated {updatedAt}</p>
+      </CardContent>
+      <CardFooter>
+        <Button variant="outline" size="sm" asChild>
+          <Link href={href}>Open</Link>
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }
