@@ -2,7 +2,14 @@ import { AppShell } from "@/components/layout/app-shell";
 import { DocumentCard } from "@/components/documents/document-card";
 import { Button } from "@/components/ui/button";
 
-const documents = [
+type DashboardDocument = {
+  title: string;
+  status: string;
+  updatedAt: string;
+  href: string;
+};
+
+const documents: DashboardDocument[] = [
   {
     title: "History Essay",
     status: "Drafting",
@@ -21,7 +28,7 @@ const documents = [
     updatedAt: "Jun 25, 2026",
     href: "/documents/literature-review",
   },
-] as const;
+];
 
 export default function DashboardPage() {
   return (
@@ -33,7 +40,13 @@ export default function DashboardPage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {documents.map((document) => (
-            <DocumentCard key={document.href} {...document} />
+            <DocumentCard
+              key={document.href}
+              title={document.title}
+              status={document.status}
+              updatedAt={document.updatedAt}
+              href={document.href}
+            />
           ))}
         </div>
       </div>
