@@ -9,21 +9,23 @@ import {
   useDocumentAutosave,
 } from "@/hooks/use-document-autosave";
 import { usePersistedWritingEvents } from "@/hooks/use-persisted-writing-events";
-import type { WritingEventInput } from "@/types/writing-event";
+import type { WritingEvent, WritingEventInput } from "@/types/writing-event";
 
 type DocumentEditorWorkspaceProps = {
   documentId: string;
   initialContent?: string;
+  initialEvents?: WritingEvent[];
 };
 
 export function DocumentEditorWorkspace({
   documentId,
   initialContent,
+  initialEvents,
 }: DocumentEditorWorkspaceProps) {
   const { autosaveStatus, handleContentChange } =
     useDocumentAutosave(documentId);
   const { events, addWritingEvents, clearEvents, chainIsValid, isLoading } =
-    usePersistedWritingEvents(documentId);
+    usePersistedWritingEvents(documentId, { initialEvents });
 
   const handleWritingEvents = useCallback(
     (inputs: WritingEventInput[]) => {

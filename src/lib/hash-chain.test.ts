@@ -87,4 +87,18 @@ describe("verifyEventChain", () => {
     expect(secondEvent.previousHash).toBe(firstEvent.eventHash);
     expect(await createEventHash(secondEvent)).toBe(secondEvent.eventHash);
   });
+
+  it("verifies a partial chain when genesis validation is disabled", async () => {
+    const firstEvent = await createWritingEvent(baseEventInput);
+    const secondEvent = await createWritingEvent({
+      ...baseEventInput,
+      insertedText: "b",
+      position: 1,
+      previousHash: firstEvent.eventHash,
+    });
+
+    await expect(
+      verifyEventChain([secondEvent], { validateGenesisLink: false }),
+    ).resolves.toBe(true);
+  });
 });

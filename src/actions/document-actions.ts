@@ -1,8 +1,12 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { mapDocument } from "@/lib/db-mappers";
-import type { Document, DocumentListItem } from "@/types/document";
+import { mapDashboardDocument, mapDocument } from "@/lib/db-mappers";
+import type {
+  Document,
+  DocumentEditorData,
+  DocumentListItem,
+} from "@/types/document";
 
 const DEMO_DOCUMENT_TITLE = "Demo Document";
 
@@ -39,20 +43,40 @@ export async function getDocumentById(
   return mapDocument(document);
 }
 
+export async function getDocumentForEditor(
+  documentId: string,
+): Promise<DocumentEditorData | null> {
+  const document = await prisma.document.findUnique({
+    where: { id: documentId },
+    select: {
+      id: true,
+      title: true,
+      content: true,
+    },
+  });
+
+  if (!document) {
+    return null;
+  }
+
+  return document;
+}
+
 export async function getDocuments(): Promise<DocumentListItem[]> {
   const documents = await prisma.document.findMany({
-    orderBy: { updatedAt: "desc" },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      createdAt: true,
+      updatedAt: true,
       _count: {
         select: { writingEvents: true },
       },
     },
+    orderBy: { updatedAt: "desc" },
   });
 
-  return documents.map((record) => ({
-    ...mapDocument(record),
-    eventCount: record._count.writingEvents,
-  }));
+  return documents.map(mapDashboardDocument);
 }
 
 export async function createDocument(title: string): Promise<Document> {
