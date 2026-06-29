@@ -22,6 +22,9 @@ The idea is to help users keep a clear drafting history by saving writing events
 - Replay the writing process
 - Generate a basic authorship report
 - Create a shareable read-only evidence link
+- Google sign-in with Clerk
+- User-owned documents
+- Public read-only share links
 
 ## Why I built this
 
