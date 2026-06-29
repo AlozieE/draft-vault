@@ -5,3 +5,7 @@ export interface Document {
   createdAt: string;
   updatedAt: string;
 }
+
+export type DocumentListItem = Document & {
+  eventCount: number;
+};

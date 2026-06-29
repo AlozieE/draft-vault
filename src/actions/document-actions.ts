@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { mapDocument } from "@/lib/db-mappers";
-import type { Document } from "@/types/document";
+import type { Document, DocumentListItem } from "@/types/document";
 
 const DEMO_DOCUMENT_TITLE = "Demo Document";
 
@@ -39,12 +39,20 @@ export async function getDocumentById(
   return mapDocument(document);
 }
 
-export async function getDocuments(): Promise<Document[]> {
+export async function getDocuments(): Promise<DocumentListItem[]> {
   const documents = await prisma.document.findMany({
     orderBy: { updatedAt: "desc" },
+    include: {
+      _count: {
+        select: { writingEvents: true },
+      },
+    },
   });
 
-  return documents.map(mapDocument);
+  return documents.map((record) => ({
+    ...mapDocument(record),
+    eventCount: record._count.writingEvents,
+  }));
 }
 
 export async function createDocument(title: string): Promise<Document> {

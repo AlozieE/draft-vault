@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
-import { createDocument } from "@/actions/document-actions";
+import { createDocument, deleteDocument } from "@/actions/document-actions";
 import { DocumentCard } from "@/components/documents/document-card";
 import { Button } from "@/components/ui/button";
-import type { Document } from "@/types/document";
+import type { DocumentListItem } from "@/types/document";
 
 type DocumentDashboardProps = {
-  initialDocuments: Document[];
+  initialDocuments: DocumentListItem[];
 };
 
 function formatUpdatedAt(isoDate: string): string {
@@ -24,17 +24,38 @@ export function DocumentDashboard({
 }: DocumentDashboardProps) {
   const [documents, setDocuments] = useState(initialDocuments);
   const [isCreating, setIsCreating] = useState(false);
+  const [deletingDocumentId, setDeletingDocumentId] = useState<string | null>(
+    null,
+  );
 
   async function handleCreateDocument() {
     setIsCreating(true);
 
     try {
       const document = await createDocument("Untitled Document");
-      setDocuments((current) => [document, ...current]);
+      setDocuments((current) => [
+        { ...document, eventCount: 0 },
+        ...current,
+      ]);
     } finally {
       setIsCreating(false);
     }
   }
+
+  const handleDeleteDocument = useCallback(async (documentId: string) => {
+    setDeletingDocumentId(documentId);
+
+    try {
+      await deleteDocument(documentId);
+      setDocuments((current) =>
+        current.filter((document) => document.id !== documentId),
+      );
+    } catch (error: unknown) {
+      console.error("Failed to delete document:", error);
+    } finally {
+      setDeletingDocumentId(null);
+    }
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -56,9 +77,12 @@ export function DocumentDashboard({
           {documents.map((document) => (
             <DocumentCard
               key={document.id}
+              id={document.id}
               title={document.title}
               updatedAt={formatUpdatedAt(document.updatedAt)}
-              href={`/documents/${document.id}`}
+              eventCount={document.eventCount}
+              isDeleting={deletingDocumentId === document.id}
+              onDelete={handleDeleteDocument}
             />
           ))}
         </div>
