@@ -1,19 +1,59 @@
 import { GENESIS_HASH } from "@/lib/constants";
-import { computeEventHash } from "@/lib/hash-chain";
-import type { WritingEvent, WritingEventType } from "@/types/writing-event";
+import { createEventHash } from "@/lib/hash-chain";
+import type { WritingEvent, WritingEventInput } from "@/types/writing-event";
 
-export function createWritingEvent(
-  documentId: string,
-  type: WritingEventType,
-  previousHash: string = GENESIS_HASH,
-  content?: string,
-): WritingEvent {
-  const id = crypto.randomUUID();
-  const timestamp = Date.now();
-  const base = { id, documentId, type, timestamp, content, previousHash };
+export type CreateWritingEventInput = WritingEventInput & {
+  previousHash?: string;
+};
+
+type OptionalWritingEventFields = Pick<
+  WritingEventInput,
+  "textPreview" | "position" | "insertedText" | "deletedText" | "fullTextSnapshot"
+>;
+
+function includeOptionalEventFields(input: OptionalWritingEventFields) {
+  return {
+    ...(input.textPreview !== undefined ? { textPreview: input.textPreview } : {}),
+    ...(input.position !== undefined ? { position: input.position } : {}),
+    ...(input.insertedText !== undefined
+      ? { insertedText: input.insertedText }
+      : {}),
+    ...(input.deletedText !== undefined ? { deletedText: input.deletedText } : {}),
+    ...(input.fullTextSnapshot !== undefined
+      ? { fullTextSnapshot: input.fullTextSnapshot }
+      : {}),
+  };
+}
+
+export async function createWritingEvent(
+  input: CreateWritingEventInput,
+): Promise<WritingEvent> {
+  const {
+    documentId,
+    type,
+    contentLengthChange,
+    wordCount,
+    characterCount,
+    previousHash = GENESIS_HASH,
+    ...optionalFields
+  } = input;
+
+  const eventData = {
+    id: crypto.randomUUID(),
+    documentId,
+    type,
+    timestamp: new Date().toISOString(),
+    contentLengthChange,
+    wordCount,
+    characterCount,
+    ...includeOptionalEventFields(optionalFields),
+    previousHash,
+  };
+
+  const eventHash = await createEventHash(eventData);
 
   return {
-    ...base,
-    hash: computeEventHash(base),
+    ...eventData,
+    eventHash,
   };
 }

@@ -1,15 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { WritingEvent } from "@/types/writing-event";
+import { GENESIS_HASH } from "@/lib/constants";
+import { verifyEventChain } from "@/lib/hash-chain";
+import { createWritingEvent } from "@/lib/writing-event-factory";
+import type { WritingEvent, WritingEventInput } from "@/types/writing-event";
 
-export function useWritingEvents(documentId: string) {
-  const [events, setEvents] = useState<WritingEvent[]>([]);
+export function useWritingEvents(initialEvents: WritingEvent[] = []) {
+  const [events, setEvents] = useState<WritingEvent[]>(initialEvents);
+  const [chainIsValid, setChainIsValid] = useState(true);
+  const eventsRef = useRef<WritingEvent[]>(initialEvents);
+  const chainQueueRef = useRef(Promise.resolve());
+
+  useEffect(() => {
+    eventsRef.current = events;
+  }, [events]);
+
+  useEffect(() => {
+    eventsRef.current = initialEvents;
+    setEvents(initialEvents);
+    void verifyEventChain(initialEvents).then(setChainIsValid);
+  }, [initialEvents]);
+
+  const addWritingEvent = useCallback((input: WritingEventInput) => {
+    chainQueueRef.current = chainQueueRef.current
+      .then(async () => {
+        const latestEvent = eventsRef.current.at(-1);
+        const previousHash = latestEvent?.eventHash ?? GENESIS_HASH;
+        const event = await createWritingEvent({
+          ...input,
+          previousHash,
+        });
+        const nextEvents = [...eventsRef.current, event];
+        const isValid = await verifyEventChain(nextEvents);
+
+        eventsRef.current = nextEvents;
+        setEvents(nextEvents);
+        setChainIsValid(isValid);
+      })
+      .catch((error: unknown) => {
+        console.error("Failed to append writing event to hash chain:", error);
+      });
+  }, []);
+
+  const clearEvents = useCallback(() => {
+    chainQueueRef.current = chainQueueRef.current.then(async () => {
+      eventsRef.current = [];
+      setEvents([]);
+      setChainIsValid(true);
+    });
+  }, []);
+
+  const latestEvent = useMemo(
+    () => (events.length > 0 ? events[events.length - 1]! : null),
+    [events],
+  );
 
   return {
-    documentId,
     events,
-    setEvents,
+    addWritingEvent,
+    clearEvents,
+    latestEvent,
+    chainIsValid,
   };
 }
