@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Draft Vault
 
-## Getting Started
+Draft Vault is a web app prototype for recording and reviewing the writing process behind a document.
 
-First, run the development server:
+The idea is to help users keep a clear drafting history by saving writing events, verifying them with a hash chain, and generating an authorship-style report that can be reviewed or shared.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Live Demo
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[View the live demo](https://draft-vault.vercel.app)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> This project is still in progress. It is an MVP/prototype and not a finished production product.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## What it does right now
 
-## Learn More
+- Create and open documents
+- Edit document titles
+- Write inside a TipTap-based editor
+- Autosave document content
+- Record writing events while typing
+- Store documents and writing events in PostgreSQL
+- Verify writing events with a tamper-evident hash chain
+- Replay the writing process
+- Generate a basic authorship report
+- Create a shareable read-only evidence link
+- Google sign-in with Clerk
+- User-owned documents
+- Public read-only share links
 
-To learn more about Next.js, take a look at the following resources:
+## Why I built this
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+AI detection tools can sometimes create uncertainty around whether a text was written by a person or generated with AI. Draft Vault explores a different approach: instead of trying to detect AI, it records the writing process itself.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The goal is not to prove authorship with 100% certainty, but to provide useful evidence of how a document was developed over time.
 
-## Deploy on Vercel
+## Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Next.js
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- TipTap editor
+- Prisma
+- PostgreSQL
+- Neon
+- Vercel
+- Vitest
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Core Concepts
+
+### Writing Events
+
+While the user writes, Draft Vault records events such as inserts, deletes, word counts, character counts, timestamps, and operation data used for replay.
+
+### Hash Chain Verification
+
+Each writing event is linked to the previous event using a hash. If an old event is changed, the chain should no longer verify correctly.
+
+### Replay
+
+The replay page reconstructs the writing process from recorded writing operations.
+
+### Authorship Report
+
+The report summarizes the drafting session, including writing duration, event counts, word count, character count, final hash, and verification status.
+
+## Project Status
+
+This project is currently a working prototype. Some important things still need improvement:
+
+- Better performance on deployed pages
+- Authentication and user-specific documents
+- Stronger production audit-log rules
+- Better event batching/debouncing
+- More polished UI and error handling
+- PDF export for reports
+- More complete testing
+
+## Disclaimer
+
+Draft Vault does not prove that a document is human-written. It provides evidence of the writing process and should be treated as a supporting tool, not as absolute proof.

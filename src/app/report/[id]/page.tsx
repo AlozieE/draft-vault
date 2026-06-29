@@ -1,7 +1,4 @@
-import {
-  getDocumentById,
-  getOrCreateDemoDocument,
-} from "@/actions/document-actions";
+import { getDocumentById } from "@/actions/document-actions";
 import { getWritingEvents } from "@/actions/writing-event-actions";
 import { AuthorshipReport } from "@/components/report/authorship-report";
 import { AppShell } from "@/components/layout/app-shell";
@@ -14,8 +11,7 @@ type ReportPageProps = {
 
 export default async function ReportPage({ params }: ReportPageProps) {
   const { id } = await params;
-  const document =
-    id === "demo" ? await getOrCreateDemoDocument() : await getDocumentById(id);
+  const document = await getDocumentById(id);
 
   const events = document ? await getWritingEvents(document.id) : [];
   const chainIsValid = await verifyEventChain(events);

@@ -1,7 +1,4 @@
-import {
-  getDocumentForEditor,
-  getOrCreateDemoDocument,
-} from "@/actions/document-actions";
+import { getDocumentForEditor } from "@/actions/document-actions";
 import { getRecentWritingEvents } from "@/actions/writing-event-actions";
 import { EditableDocumentTitle } from "@/components/documents/editable-document-title";
 import { ShareLinkButton } from "@/components/documents/share-link-button";
@@ -16,8 +13,7 @@ export const dynamic = "force-dynamic";
 
 export default async function DocumentPage({ params }: DocumentPageProps) {
   const { id } = await params;
-  const document =
-    id === "demo" ? await getOrCreateDemoDocument() : await getDocumentForEditor(id);
+  const document = await getDocumentForEditor(id);
   const initialEvents = document
     ? await getRecentWritingEvents(document.id)
     : [];
@@ -39,7 +35,6 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
             documentId={document.id}
             initialContent={document.content}
             initialEvents={initialEvents}
-            isDemoDocument={id === "demo"}
           />
         </div>
       ) : (

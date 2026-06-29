@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 import { Separator } from "@/components/ui/separator";
-import { APP_NAME } from "@/lib/constants";
 import { APP_NAV_ITEMS } from "@/lib/app-nav";
+import { APP_NAME } from "@/lib/constants";
 
 export function AppSidebar() {
   return (

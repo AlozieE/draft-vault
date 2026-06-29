@@ -1,7 +1,4 @@
-import {
-  getDocumentById,
-  getOrCreateDemoDocument,
-} from "@/actions/document-actions";
+import { getDocumentById } from "@/actions/document-actions";
 import { getWritingEvents } from "@/actions/writing-event-actions";
 import { ReplayPlayer } from "@/components/replay/replay-player";
 import { AppShell } from "@/components/layout/app-shell";
@@ -12,8 +9,7 @@ type ReplayPageProps = {
 
 export default async function ReplayPage({ params }: ReplayPageProps) {
   const { id } = await params;
-  const document =
-    id === "demo" ? await getOrCreateDemoDocument() : await getDocumentById(id);
+  const document = await getDocumentById(id);
 
   const events = document ? await getWritingEvents(document.id) : [];
 

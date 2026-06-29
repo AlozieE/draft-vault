@@ -12,29 +12,6 @@ import type {
   DocumentListItem,
 } from "@/types/document";
 
-const DEMO_DOCUMENT_TITLE = "Demo Document";
-
-export async function getOrCreateDemoDocument(): Promise<Document> {
-  const ownerId = await getCurrentUserId();
-
-  const existingDocument = await prisma.document.findFirst({
-    where: { title: DEMO_DOCUMENT_TITLE, ownerId },
-  });
-
-  if (existingDocument) {
-    return mapDocument(existingDocument);
-  }
-
-  const createdDocument = await prisma.document.create({
-    data: {
-      title: DEMO_DOCUMENT_TITLE,
-      content: "<p>Start writing your draft here...</p>",
-      ownerId,
-    },
-  });
-
-  return mapDocument(createdDocument);
-}
 
 export async function getDocumentById(
   documentId: string,
