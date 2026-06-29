@@ -13,14 +13,14 @@ import {
 
 type DocumentCardProps = {
   title: string;
-  status: string;
+  status?: string;
   updatedAt: string;
   href: string;
 };
 
 export function DocumentCard({
   title,
-  status,
+  status = "Draft",
   updatedAt,
   href,
 }: DocumentCardProps) {

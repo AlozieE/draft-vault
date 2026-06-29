@@ -39,6 +39,31 @@ export async function getDocumentById(
   return mapDocument(document);
 }
 
+export async function getDocuments(): Promise<Document[]> {
+  const documents = await prisma.document.findMany({
+    orderBy: { updatedAt: "desc" },
+  });
+
+  return documents.map(mapDocument);
+}
+
+export async function createDocument(title: string): Promise<Document> {
+  const document = await prisma.document.create({
+    data: {
+      title,
+      content: "",
+    },
+  });
+
+  return mapDocument(document);
+}
+
+export async function deleteDocument(documentId: string): Promise<void> {
+  await prisma.document.delete({
+    where: { id: documentId },
+  });
+}
+
 export async function updateDocumentContent(
   documentId: string,
   content: string,
