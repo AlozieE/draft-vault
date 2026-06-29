@@ -32,7 +32,7 @@ export default async function SharePage({ params }: SharePageProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border px-6 py-4">
+      <header className="border-b border-border px-6 py-4 print:hidden">
         <p className="text-sm text-muted-foreground">Draft Vault</p>
         <h1 className="mt-1 text-2xl font-semibold">{shareLink.document.title}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -40,21 +40,26 @@ export default async function SharePage({ params }: SharePageProps) {
         </p>
       </header>
 
-      <main className="mx-auto max-w-3xl space-y-6 px-6 py-8">
+      <main className="mx-auto max-w-3xl space-y-6 px-6 py-8 print:max-w-none print:px-0 print:py-0">
         {events.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center">
+          <div className="rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center print:hidden">
             <p className="text-sm text-muted-foreground">
               No writing events found for this document.
             </p>
           </div>
         ) : (
           <>
-            <AuthorshipReport report={report} />
-            <ReplayPlayer events={events} />
+            <AuthorshipReport
+              report={report}
+              documentTitle={shareLink.document.title}
+            />
+            <div className="print:hidden">
+              <ReplayPlayer events={events} />
+            </div>
           </>
         )}
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground print:hidden">
           This report provides evidence of the writing process, not absolute
           proof of authorship.
         </p>

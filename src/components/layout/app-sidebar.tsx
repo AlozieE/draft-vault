@@ -12,7 +12,7 @@ const navItems = [
 
 export function AppSidebar() {
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-sidebar">
+    <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-sidebar print:hidden">
       <div className="p-4">
         <p className="text-sm font-semibold text-sidebar-foreground">
           {APP_NAME}

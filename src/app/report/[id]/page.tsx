@@ -23,8 +23,8 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-3xl space-y-6">
-        <div>
+      <div className="mx-auto max-w-3xl space-y-6 print:max-w-none print:space-y-4">
+        <div className="print:hidden">
           <h1 className="text-2xl font-semibold">Document Report</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Review the verified drafting history for this document.
@@ -32,22 +32,22 @@ export default async function ReportPage({ params }: ReportPageProps) {
         </div>
 
         {!document ? (
-          <div className="flex flex-col items-center justify-center py-24">
+          <div className="flex flex-col items-center justify-center py-24 print:hidden">
             <h2 className="text-xl font-semibold">Document not found</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               No document exists for &ldquo;{id}&rdquo;.
             </p>
           </div>
         ) : events.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center">
+          <div className="rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center print:hidden">
             <p className="text-sm text-muted-foreground">
               No writing events found. Write in the editor first.
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
-            <p className="text-sm font-medium">{document.title}</p>
-            <AuthorshipReport report={report} />
+          <div className="space-y-4 print:space-y-0">
+            <p className="text-sm font-medium print:hidden">{document.title}</p>
+            <AuthorshipReport report={report} documentTitle={document.title} />
           </div>
         )}
       </div>

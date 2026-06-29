@@ -129,3 +129,39 @@
     @apply bg-background text-foreground font-sans;
   }
 }
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .print-hidden,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .print-full-width {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .print-report {
+    color: black !important;
+  }
+
+  .print-report [data-slot="card"] {
+    background: white !important;
+    box-shadow: none !important;
+  }
+
+  @page {
+    margin: 20mm;
+    size: A4;
+  }
+}
