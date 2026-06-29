@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "prisma generate && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -12,6 +12,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.5.9",
     "@prisma/client": "^6.19.3",
     "@tiptap/pm": "^3.27.1",
     "@tiptap/react": "^3.27.1",

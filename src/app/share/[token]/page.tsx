@@ -1,4 +1,4 @@
-import { getWritingEvents } from "@/actions/writing-event-actions";
+import { getWritingEventsForSharedDocument } from "@/actions/writing-event-actions";
 import { getShareLinkByToken } from "@/actions/share-link-actions";
 import { AuthorshipReport } from "@/components/report/authorship-report";
 import { ReplayPlayer } from "@/components/replay/replay-player";
@@ -26,7 +26,7 @@ export default async function SharePage({ params }: SharePageProps) {
     );
   }
 
-  const events = await getWritingEvents(shareLink.document.id);
+  const events = await getWritingEventsForSharedDocument(shareLink.document.id);
   const chainIsValid = await verifyEventChain(events);
   const report = createAuthorshipReport(events, chainIsValid);
 

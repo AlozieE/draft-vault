@@ -1,10 +1,11 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { findOwnedDocument } from "@/lib/document-ownership";
 import {
   mapShareLink,
   mapShareLinkWithDocument,
 } from "@/lib/share-link-mapper";
+import { prisma } from "@/lib/prisma";
 import type { ShareLink, ShareLinkWithDocument } from "@/types/share-link";
 
 function generateShareToken(): string {
@@ -12,9 +13,7 @@ function generateShareToken(): string {
 }
 
 export async function createShareLink(documentId: string): Promise<ShareLink> {
-  const document = await prisma.document.findUnique({
-    where: { id: documentId },
-  });
+  const document = await findOwnedDocument(documentId);
 
   if (!document) {
     throw new Error("Document not found");
