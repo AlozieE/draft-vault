@@ -12,6 +12,25 @@ import { verifyEventChain } from "@/lib/hash-chain";
 import { createWritingEvent } from "@/lib/writing-event-factory";
 import type { WritingEvent, WritingEventInput } from "@/types/writing-event";
 
+async function persistWritingEventRecord(event: WritingEvent): Promise<WritingEvent> {
+  return createWritingEventRecord({
+    id: event.id,
+    documentId: event.documentId,
+    type: event.type,
+    timestamp: event.timestamp,
+    contentLengthChange: event.contentLengthChange,
+    wordCount: event.wordCount,
+    characterCount: event.characterCount,
+    textPreview: event.textPreview,
+    position: event.position,
+    insertedText: event.insertedText,
+    deletedText: event.deletedText,
+    fullTextSnapshot: event.fullTextSnapshot,
+    previousHash: event.previousHash,
+    eventHash: event.eventHash,
+  });
+}
+
 export function usePersistedWritingEvents(documentId: string) {
   const [events, setEvents] = useState<WritingEvent[]>([]);
   const [chainIsValid, setChainIsValid] = useState(true);
@@ -55,53 +74,58 @@ export function usePersistedWritingEvents(documentId: string) {
     };
   }, [documentId]);
 
-  const addWritingEvent = useCallback(
-    (input: WritingEventInput) => {
+  const addWritingEvents = useCallback(
+    (inputs: WritingEventInput[]) => {
+      if (inputs.length === 0) {
+        return;
+      }
+
       chainQueueRef.current = chainQueueRef.current
         .then(async () => {
-          const latestEvent = eventsRef.current.at(-1);
-          const previousHash = latestEvent?.eventHash ?? GENESIS_HASH;
-          const event = await createWritingEvent({
-            ...input,
-            documentId,
-            previousHash,
-          });
+          let workingEvents = [...eventsRef.current];
 
-          const optimisticEvents = [...eventsRef.current, event];
-          eventsRef.current = optimisticEvents;
-          setEvents(optimisticEvents);
-
-          try {
-            const savedEvent = await createWritingEventRecord({
-              id: event.id,
-              documentId: event.documentId,
-              type: event.type,
-              timestamp: event.timestamp,
-              contentLengthChange: event.contentLengthChange,
-              wordCount: event.wordCount,
-              characterCount: event.characterCount,
-              textPreview: event.textPreview,
-              previousHash: event.previousHash,
-              eventHash: event.eventHash,
+          for (const input of inputs) {
+            const previousHash =
+              workingEvents.at(-1)?.eventHash ?? GENESIS_HASH;
+            const event = await createWritingEvent({
+              ...input,
+              documentId,
+              previousHash,
             });
 
-            const nextEvents = [...eventsRef.current.slice(0, -1), savedEvent];
-            eventsRef.current = nextEvents;
-            setEvents(nextEvents);
-            setChainIsValid(await verifyEventChain(nextEvents));
-          } catch (error: unknown) {
-            const revertedEvents = eventsRef.current.slice(0, -1);
-            eventsRef.current = revertedEvents;
-            setEvents(revertedEvents);
-            setChainIsValid(await verifyEventChain(revertedEvents));
-            console.error("Failed to save writing event:", error);
+            workingEvents = [...workingEvents, event];
+            eventsRef.current = workingEvents;
+            setEvents(workingEvents);
+
+            try {
+              const savedEvent = await persistWritingEventRecord(event);
+              workingEvents = [...workingEvents.slice(0, -1), savedEvent];
+              eventsRef.current = workingEvents;
+              setEvents(workingEvents);
+            } catch (error: unknown) {
+              workingEvents = workingEvents.slice(0, -1);
+              eventsRef.current = workingEvents;
+              setEvents(workingEvents);
+              setChainIsValid(await verifyEventChain(workingEvents));
+              console.error("Failed to save writing event:", error);
+              return;
+            }
           }
+
+          setChainIsValid(await verifyEventChain(workingEvents));
         })
         .catch((error: unknown) => {
-          console.error("Failed to append writing event:", error);
+          console.error("Failed to append writing events:", error);
         });
     },
     [documentId],
+  );
+
+  const addWritingEvent = useCallback(
+    (input: WritingEventInput) => {
+      addWritingEvents([input]);
+    },
+    [addWritingEvents],
   );
 
   const clearEvents = useCallback(() => {
@@ -125,6 +149,7 @@ export function usePersistedWritingEvents(documentId: string) {
   return {
     events,
     addWritingEvent,
+    addWritingEvents,
     clearEvents,
     latestEvent,
     chainIsValid,

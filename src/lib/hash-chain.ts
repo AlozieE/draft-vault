@@ -10,6 +10,10 @@ export type HashableEventData = {
   wordCount: number;
   characterCount: number;
   textPreview?: string;
+  position?: number;
+  insertedText?: string;
+  deletedText?: string;
+  fullTextSnapshot?: string;
   previousHash: string;
 };
 
@@ -22,6 +26,10 @@ type HashableEventInput = {
   wordCount: number;
   characterCount: number;
   textPreview?: string | null;
+  position?: number | null;
+  insertedText?: string | null;
+  deletedText?: string | null;
+  fullTextSnapshot?: string | null;
   previousHash: string;
 };
 
@@ -45,6 +53,22 @@ export function getHashableEventData(
 
   if (event.textPreview != null) {
     hashable.textPreview = event.textPreview;
+  }
+
+  if (event.position != null) {
+    hashable.position = event.position;
+  }
+
+  if (event.insertedText != null) {
+    hashable.insertedText = event.insertedText;
+  }
+
+  if (event.deletedText != null) {
+    hashable.deletedText = event.deletedText;
+  }
+
+  if (event.fullTextSnapshot != null) {
+    hashable.fullTextSnapshot = event.fullTextSnapshot;
   }
 
   return hashable;

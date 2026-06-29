@@ -6,15 +6,29 @@ export function applyWritingEvent(
 ): string {
   switch (event.type) {
     case "insert":
-    case "paste":
-      return currentText + (event.textPreview ?? "");
-    case "delete":
-      return currentText.slice(
-        0,
-        currentText.length - Math.abs(event.contentLengthChange),
+    case "paste": {
+      if (event.insertedText == null || event.position == null) {
+        return currentText;
+      }
+
+      return (
+        currentText.slice(0, event.position) +
+        event.insertedText +
+        currentText.slice(event.position)
       );
+    }
+    case "delete": {
+      if (event.deletedText == null || event.position == null) {
+        return currentText;
+      }
+
+      return (
+        currentText.slice(0, event.position) +
+        currentText.slice(event.position + event.deletedText.length)
+      );
+    }
     case "snapshot":
-      return currentText;
+      return event.fullTextSnapshot ?? currentText;
     default:
       return currentText;
   }

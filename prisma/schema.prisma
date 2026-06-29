@@ -39,6 +39,10 @@ model WritingEvent {
   wordCount           Int
   characterCount      Int
   textPreview         String?
+  position            Int?
+  insertedText        String?
+  deletedText         String?
+  fullTextSnapshot    String?
   previousHash        String
   eventHash           String
   createdAt           DateTime @default(now())

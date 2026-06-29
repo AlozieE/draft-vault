@@ -7,6 +7,10 @@ import { useRef } from "react";
 
 import { EditorToolbar } from "@/components/editor/editor-toolbar";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  computeTextChanges,
+  createTextPreview,
+} from "@/lib/text-change";
 import { cn } from "@/lib/utils";
 import type { WritingEventInput, WritingEventType } from "@/types/writing-event";
 
@@ -22,7 +26,7 @@ const editorContentClass = cn(
 type WritingEditorProps = {
   documentId: string;
   initialContent?: string;
-  onWritingEvent?: (input: WritingEventInput) => void;
+  onWritingEvents?: (inputs: WritingEventInput[]) => void;
   onContentChange?: (content: string) => void;
 };
 
@@ -35,49 +39,76 @@ function countWords(text: string): number {
   return trimmed.split(/\s+/).length;
 }
 
-function resolveEventType(contentLengthChange: number): WritingEventType {
-  if (contentLengthChange > 1) {
-    return "insert";
-  }
+function resolveInsertEventType(insertedText: string): WritingEventType {
+  return insertedText.length > 1 ? "paste" : "insert";
+}
 
-  if (contentLengthChange < 0) {
-    return "delete";
-  }
+function buildWritingEventInputs(
+  documentId: string,
+  changes: ReturnType<typeof computeTextChanges>,
+  wordCount: number,
+  characterCount: number,
+): WritingEventInput[] {
+  return changes.map((change) => {
+    if (change.type === "insert") {
+      return {
+        documentId,
+        type: resolveInsertEventType(change.insertedText),
+        contentLengthChange: change.insertedText.length,
+        wordCount,
+        characterCount,
+        position: change.position,
+        insertedText: change.insertedText,
+        textPreview: createTextPreview(change),
+      };
+    }
 
-  return "insert";
+    return {
+      documentId,
+      type: "delete",
+      contentLengthChange: -change.deletedText.length,
+      wordCount,
+      characterCount,
+      position: change.position,
+      deletedText: change.deletedText,
+      textPreview: createTextPreview(change),
+    };
+  });
 }
 
 export function WritingEditor({
   documentId,
   initialContent = defaultContent,
-  onWritingEvent,
+  onWritingEvents,
   onContentChange,
 }: WritingEditorProps) {
-  const previousLengthRef = useRef<number | null>(null);
-  const onWritingEventRef = useRef(onWritingEvent);
+  const previousTextRef = useRef<string | null>(null);
+  const onWritingEventsRef = useRef(onWritingEvents);
   const onContentChangeRef = useRef(onContentChange);
 
-  onWritingEventRef.current = onWritingEvent;
+  onWritingEventsRef.current = onWritingEvents;
   onContentChangeRef.current = onContentChange;
 
   const handleUpdate = (editor: Editor) => {
     const text = editor.getText();
-    const characterCount = text.length;
-    const previousLength = previousLengthRef.current ?? characterCount;
-    const contentLengthChange = characterCount - previousLength;
+    const previousText = previousTextRef.current ?? text;
+    const changes = computeTextChanges(previousText, text);
 
-    previousLengthRef.current = characterCount;
-
+    previousTextRef.current = text;
     onContentChangeRef.current?.(editor.getHTML());
 
-    onWritingEventRef.current?.({
+    if (changes.length === 0) {
+      return;
+    }
+
+    const inputs = buildWritingEventInputs(
       documentId,
-      type: resolveEventType(contentLengthChange),
-      contentLengthChange,
-      wordCount: countWords(text),
-      characterCount,
-      textPreview: text.slice(-80) || undefined,
-    });
+      changes,
+      countWords(text),
+      text.length,
+    );
+
+    onWritingEventsRef.current?.(inputs);
   };
 
   const editor = useEditor({
@@ -90,7 +121,7 @@ export function WritingEditor({
       },
     },
     onCreate: ({ editor: createdEditor }) => {
-      previousLengthRef.current = createdEditor.getText().length;
+      previousTextRef.current = createdEditor.getText();
     },
     onUpdate: ({ editor: updatedEditor }) => {
       handleUpdate(updatedEditor);

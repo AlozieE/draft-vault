@@ -7,6 +7,10 @@ export type WritingEventInput = {
   wordCount: number;
   characterCount: number;
   textPreview?: string;
+  position?: number;
+  insertedText?: string;
+  deletedText?: string;
+  fullTextSnapshot?: string;
 };
 
 export interface WritingEvent extends WritingEventInput {

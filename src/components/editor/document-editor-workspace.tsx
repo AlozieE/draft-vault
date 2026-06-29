@@ -17,17 +17,19 @@ export function DocumentEditorWorkspace({
   document,
 }: DocumentEditorWorkspaceProps) {
   const saveTimeoutRef = useRef<number | null>(null);
-  const { events, addWritingEvent, clearEvents, chainIsValid, isLoading } =
+  const { events, addWritingEvents, clearEvents, chainIsValid, isLoading } =
     usePersistedWritingEvents(document.id);
 
-  const handleWritingEvent = useCallback(
-    (input: WritingEventInput) => {
-      addWritingEvent({
-        ...input,
-        documentId: document.id,
-      });
+  const handleWritingEvents = useCallback(
+    (inputs: WritingEventInput[]) => {
+      addWritingEvents(
+        inputs.map((input) => ({
+          ...input,
+          documentId: document.id,
+        })),
+      );
     },
-    [addWritingEvent, document.id],
+    [addWritingEvents, document.id],
   );
 
   const handleClearTimeline = useCallback(() => {
@@ -52,7 +54,7 @@ export function DocumentEditorWorkspace({
       <WritingEditor
         documentId={document.id}
         initialContent={document.content}
-        onWritingEvent={handleWritingEvent}
+        onWritingEvents={handleWritingEvents}
         onContentChange={handleContentChange}
       />
       <WritingTimeline

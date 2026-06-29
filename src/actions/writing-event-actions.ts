@@ -16,6 +16,10 @@ export type CreateWritingEventRecordInput = {
   wordCount: number;
   characterCount: number;
   textPreview?: string;
+  position?: number;
+  insertedText?: string;
+  deletedText?: string;
+  fullTextSnapshot?: string;
   previousHash: string;
   eventHash: string;
 };
@@ -25,7 +29,7 @@ export async function getWritingEvents(
 ): Promise<WritingEvent[]> {
   const events = await prisma.writingEvent.findMany({
     where: { documentId },
-    orderBy: { timestamp: "asc" },
+    orderBy: [{ timestamp: "asc" }, { createdAt: "asc" }],
   });
 
   return mapWritingEventRecordsToWritingEvents(events);
@@ -44,6 +48,14 @@ export async function createWritingEventRecord(
       wordCount: input.wordCount,
       characterCount: input.characterCount,
       textPreview: input.textPreview,
+      ...(input.position !== undefined ? { position: input.position } : {}),
+      ...(input.insertedText !== undefined
+        ? { insertedText: input.insertedText }
+        : {}),
+      ...(input.deletedText !== undefined ? { deletedText: input.deletedText } : {}),
+      ...(input.fullTextSnapshot !== undefined
+        ? { fullTextSnapshot: input.fullTextSnapshot }
+        : {}),
       previousHash: input.previousHash,
       eventHash: input.eventHash,
     },

@@ -18,6 +18,14 @@ function toWritingEventType(type: string): WritingEventType {
   return "insert";
 }
 
+function mapOptionalString(value: string | null): string | undefined {
+  return value ?? undefined;
+}
+
+function mapOptionalNumber(value: number | null): number | undefined {
+  return value ?? undefined;
+}
+
 export function mapWritingEventRecordToWritingEvent(
   record: PrismaWritingEvent,
 ): WritingEvent {
@@ -29,7 +37,11 @@ export function mapWritingEventRecordToWritingEvent(
     contentLengthChange: record.contentLengthChange,
     wordCount: record.wordCount,
     characterCount: record.characterCount,
-    textPreview: record.textPreview ?? undefined,
+    textPreview: mapOptionalString(record.textPreview),
+    position: mapOptionalNumber(record.position),
+    insertedText: mapOptionalString(record.insertedText),
+    deletedText: mapOptionalString(record.deletedText),
+    fullTextSnapshot: mapOptionalString(record.fullTextSnapshot),
     previousHash: record.previousHash,
     eventHash: record.eventHash,
   };

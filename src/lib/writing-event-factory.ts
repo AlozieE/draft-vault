@@ -6,15 +6,38 @@ export type CreateWritingEventInput = WritingEventInput & {
   previousHash?: string;
 };
 
-export async function createWritingEvent({
-  documentId,
-  type,
-  contentLengthChange,
-  wordCount,
-  characterCount,
-  textPreview,
-  previousHash = GENESIS_HASH,
-}: CreateWritingEventInput): Promise<WritingEvent> {
+type OptionalWritingEventFields = Pick<
+  WritingEventInput,
+  "textPreview" | "position" | "insertedText" | "deletedText" | "fullTextSnapshot"
+>;
+
+function includeOptionalEventFields(input: OptionalWritingEventFields) {
+  return {
+    ...(input.textPreview !== undefined ? { textPreview: input.textPreview } : {}),
+    ...(input.position !== undefined ? { position: input.position } : {}),
+    ...(input.insertedText !== undefined
+      ? { insertedText: input.insertedText }
+      : {}),
+    ...(input.deletedText !== undefined ? { deletedText: input.deletedText } : {}),
+    ...(input.fullTextSnapshot !== undefined
+      ? { fullTextSnapshot: input.fullTextSnapshot }
+      : {}),
+  };
+}
+
+export async function createWritingEvent(
+  input: CreateWritingEventInput,
+): Promise<WritingEvent> {
+  const {
+    documentId,
+    type,
+    contentLengthChange,
+    wordCount,
+    characterCount,
+    previousHash = GENESIS_HASH,
+    ...optionalFields
+  } = input;
+
   const eventData = {
     id: crypto.randomUUID(),
     documentId,
@@ -23,7 +46,7 @@ export async function createWritingEvent({
     contentLengthChange,
     wordCount,
     characterCount,
-    ...(textPreview !== undefined ? { textPreview } : {}),
+    ...includeOptionalEventFields(optionalFields),
     previousHash,
   };
 
