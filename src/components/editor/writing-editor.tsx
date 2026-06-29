@@ -78,7 +78,7 @@ function buildWritingEventInputs(
 
 export function WritingEditor({
   documentId,
-  initialContent = defaultContent,
+  initialContent,
   onWritingEvents,
   onContentChange,
 }: WritingEditorProps) {
@@ -113,7 +113,7 @@ export function WritingEditor({
 
   const editor = useEditor({
     extensions: [StarterKit],
-    content: initialContent || defaultContent,
+    content: initialContent ?? defaultContent,
     immediatelyRender: false,
     editorProps: {
       attributes: {

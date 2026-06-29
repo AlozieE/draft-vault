@@ -23,7 +23,10 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
             documentId={document.id}
             initialTitle={document.title}
           />
-          <DocumentEditorWorkspace document={document} />
+          <DocumentEditorWorkspace
+            documentId={document.id}
+            initialContent={document.content}
+          />
         </div>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center py-24">

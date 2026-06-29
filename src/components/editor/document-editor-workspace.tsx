@@ -1,68 +1,65 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 
-import { updateDocumentContent } from "@/actions/document-actions";
 import { WritingEditor } from "@/components/editor/writing-editor";
 import { WritingTimeline } from "@/components/editor/writing-timeline";
+import {
+  getAutosaveStatusLabel,
+  useDocumentAutosave,
+} from "@/hooks/use-document-autosave";
 import { usePersistedWritingEvents } from "@/hooks/use-persisted-writing-events";
-import type { Document } from "@/types/document";
 import type { WritingEventInput } from "@/types/writing-event";
 
 type DocumentEditorWorkspaceProps = {
-  document: Document;
+  documentId: string;
+  initialContent?: string;
 };
 
 export function DocumentEditorWorkspace({
-  document,
+  documentId,
+  initialContent,
 }: DocumentEditorWorkspaceProps) {
-  const saveTimeoutRef = useRef<number | null>(null);
+  const { autosaveStatus, handleContentChange } =
+    useDocumentAutosave(documentId);
   const { events, addWritingEvents, clearEvents, chainIsValid, isLoading } =
-    usePersistedWritingEvents(document.id);
+    usePersistedWritingEvents(documentId);
 
   const handleWritingEvents = useCallback(
     (inputs: WritingEventInput[]) => {
       addWritingEvents(
         inputs.map((input) => ({
           ...input,
-          documentId: document.id,
+          documentId,
         })),
       );
     },
-    [addWritingEvents, document.id],
+    [addWritingEvents, documentId],
   );
 
   const handleClearTimeline = useCallback(() => {
     clearEvents();
   }, [clearEvents]);
 
-  const handleContentChange = useCallback(
-    (content: string) => {
-      if (saveTimeoutRef.current) {
-        window.clearTimeout(saveTimeoutRef.current);
-      }
-
-      saveTimeoutRef.current = window.setTimeout(() => {
-        void updateDocumentContent(document.id, content);
-      }, 500);
-    },
-    [document.id],
-  );
-
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-      <WritingEditor
-        documentId={document.id}
-        initialContent={document.content}
-        onWritingEvents={handleWritingEvents}
-        onContentChange={handleContentChange}
-      />
-      <WritingTimeline
-        events={events}
-        chainIsValid={chainIsValid}
-        isLoading={isLoading}
-        onClear={handleClearTimeline}
-      />
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">
+        {getAutosaveStatusLabel(autosaveStatus)}
+      </p>
+      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+        <WritingEditor
+          documentId={documentId}
+          initialContent={initialContent}
+          onWritingEvents={handleWritingEvents}
+          onContentChange={handleContentChange}
+        />
+        <WritingTimeline
+          events={events}
+          chainIsValid={chainIsValid}
+          isLoading={isLoading}
+          onClear={handleClearTimeline}
+        />
+      </div>
     </div>
   );
 }
