@@ -19,9 +19,9 @@ export default async function ReplayPage({ params }: ReplayPageProps) {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-3xl space-y-6">
+      <div className="mx-auto min-w-0 max-w-3xl space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold">Writing Replay</h1>
+          <h1 className="text-xl font-semibold sm:text-2xl">Writing Replay</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Replay the document creation process from recorded writing events.
           </p>
@@ -41,8 +41,8 @@ export default async function ReplayPage({ params }: ReplayPageProps) {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
-            <p className="text-sm font-medium">{document.title}</p>
+          <div className="min-w-0 space-y-4">
+            <p className="break-words text-sm font-medium">{document.title}</p>
             <ReplayPlayer events={events} />
           </div>
         )}

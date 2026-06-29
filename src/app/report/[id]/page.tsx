@@ -23,9 +23,9 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-3xl space-y-6 print:max-w-none print:space-y-4">
+      <div className="mx-auto min-w-0 max-w-3xl space-y-6 print:max-w-none print:space-y-4">
         <div className="print:hidden">
-          <h1 className="text-2xl font-semibold">Document Report</h1>
+          <h1 className="text-xl font-semibold sm:text-2xl">Document Report</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Review the verified drafting history for this document.
           </p>

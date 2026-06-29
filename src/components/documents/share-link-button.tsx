@@ -49,13 +49,14 @@ export function ShareLinkButton({ documentId }: ShareLinkButtonProps) {
   }
 
   return (
-    <div className="flex flex-col items-end gap-2">
+    <div className="flex w-full min-w-0 flex-col items-stretch gap-2 sm:w-auto sm:items-end">
       <Button
         type="button"
         variant="outline"
         size="sm"
         onClick={shareUrl ? handleCopyAgain : handleCreateShareLink}
         disabled={isCreating}
+        className="w-full sm:w-auto"
       >
         {isCreating
           ? "Creating..."
@@ -64,7 +65,7 @@ export function ShareLinkButton({ documentId }: ShareLinkButtonProps) {
             : "Create share link"}
       </Button>
       {shareUrl ? (
-        <p className="max-w-xs truncate text-xs text-muted-foreground">
+        <p className="max-w-full truncate text-xs break-all text-muted-foreground sm:max-w-xs">
           {shareUrl}
         </p>
       ) : null}

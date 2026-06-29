@@ -67,8 +67,8 @@ export function DocumentEditorWorkspace({
       <p className="shrink-0 text-sm text-muted-foreground">
         {getAutosaveStatusLabel(autosaveStatus)}
       </p>
-      <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(18rem,1fr)_minmax(12rem,20rem)] gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:grid-rows-1">
-        <div className="flex min-h-0 flex-col">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 md:gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:grid-rows-1">
+        <div className="flex min-h-[min(50vh,28rem)] min-w-0 flex-col md:min-h-0">
           <WritingEditor
             documentId={documentId}
             initialContent={initialContent}
@@ -76,7 +76,7 @@ export function DocumentEditorWorkspace({
             onContentChange={handleContentChange}
           />
         </div>
-        <div className="flex min-h-0 flex-col">
+        <div className="flex min-h-[14rem] max-h-[min(40vh,20rem)] min-w-0 flex-col md:max-h-none md:min-h-0">
           <WritingTimeline
             events={events}
             chainIsValid={chainIsValid}

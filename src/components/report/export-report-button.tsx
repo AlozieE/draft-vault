@@ -11,6 +11,7 @@ export function ExportReportButton() {
       type="button"
       variant="outline"
       size="sm"
+      className="w-full sm:w-auto"
       onClick={() => window.print()}
     >
       <FileDown className="size-4" />
@@ -21,9 +22,9 @@ export function ExportReportButton() {
 
 export function ReportExportActions() {
   return (
-    <div className="flex flex-col items-end gap-1.5 print:hidden">
+    <div className="flex w-full min-w-0 flex-col items-stretch gap-1.5 sm:max-w-xs sm:items-end print:hidden">
       <ExportReportButton />
-      <p className="max-w-52 text-right text-xs leading-relaxed text-muted-foreground">
+      <p className="text-xs leading-relaxed text-muted-foreground sm:text-right">
         {REPORT_EXPORT_TIP}
       </p>
     </div>

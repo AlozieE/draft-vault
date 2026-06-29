@@ -25,12 +25,14 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
   return (
     <AppShell>
       {document ? (
-        <div className="flex h-[calc(100vh-6.5rem)] min-h-0 flex-col gap-6">
-          <div className="flex shrink-0 items-start justify-between gap-4">
-            <EditableDocumentTitle
-              documentId={document.id}
-              initialTitle={document.title}
-            />
+        <div className="flex min-w-0 flex-col gap-4 md:h-[calc(100vh-6.5rem)] md:min-h-0 md:gap-6">
+          <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <EditableDocumentTitle
+                documentId={document.id}
+                initialTitle={document.title}
+              />
+            </div>
             <ShareLinkButton documentId={document.id} />
           </div>
           <DocumentEditorWorkspace
