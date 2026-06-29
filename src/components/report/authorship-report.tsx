@@ -7,13 +7,23 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ExportReportButton } from "@/components/report/export-report-button";
-import { REPORT_PRINT_DISCLAIMER } from "@/lib/report-export";
+import { ReportExportActions } from "@/components/report/export-report-button";
+import { ReportPrintFooter } from "@/components/report/report-print-footer";
+import { ReportPrintHeader } from "@/components/report/report-print-header";
+import {
+  formatReportGeneratedAt,
+  getVerificationStatusLabel,
+} from "@/lib/report-export";
 import type { AuthorshipReport as AuthorshipReportData } from "@/lib/report-metrics";
 
 type AuthorshipReportProps = {
   report: AuthorshipReportData;
-  documentTitle?: string;
+  documentTitle: string;
+};
+
+type ReportMetricItem = {
+  label: string;
+  value: string;
 };
 
 function shortenHash(eventHash: string): string {
@@ -24,19 +34,71 @@ function shortenHash(eventHash: string): string {
   return eventHash.slice(0, 16);
 }
 
-export function AuthorshipReport({ report, documentTitle }: AuthorshipReportProps) {
+function PrintMetricGrid({ items }: { items: readonly ReportMetricItem[] }) {
+  return (
+    <div className="report-print-metric-grid hidden print:grid">
+      {items.map((item) => (
+        <div key={item.label} className="report-print-metric-cell">
+          <p className="report-print-metric-label">{item.label}</p>
+          <p className="report-print-metric-value">{item.value}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PrintMetricTable({
+  title,
+  items,
+}: {
+  title: string;
+  items: readonly ReportMetricItem[];
+}) {
+  return (
+    <section className="report-print-section hidden print:block">
+      <h2 className="report-print-section-title">{title}</h2>
+      <table className="report-print-table">
+        <tbody>
+          {items.map((item) => (
+            <tr key={item.label}>
+              <th scope="row">{item.label}</th>
+              <td
+                className={
+                  item.label === "Final event hash" ? "font-mono" : undefined
+                }
+              >
+                {item.value}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
+export function AuthorshipReport({
+  report,
+  documentTitle,
+}: AuthorshipReportProps) {
+  const generatedAtLabel = formatReportGeneratedAt();
+  const verificationLabel = getVerificationStatusLabel(report.chainIsValid);
+
   const summaryItems = [
     { label: "Writing duration", value: report.writingDuration },
     { label: "Total events", value: String(report.totalEvents) },
     { label: "Final word count", value: String(report.finalWordCount) },
-    { label: "Final character count", value: String(report.finalCharacterCount) },
+    {
+      label: "Final character count",
+      value: String(report.finalCharacterCount),
+    },
   ] as const;
 
   const breakdownItems = [
-    { label: "Insert events", value: report.insertEvents },
-    { label: "Delete events", value: report.deleteEvents },
-    { label: "Paste events", value: report.pasteEvents },
-    { label: "Snapshot events", value: report.snapshotEvents },
+    { label: "Insert events", value: String(report.insertEvents) },
+    { label: "Delete events", value: String(report.deleteEvents) },
+    { label: "Paste events", value: String(report.pasteEvents) },
+    { label: "Snapshot events", value: String(report.snapshotEvents) },
   ] as const;
 
   const integrityItems = [
@@ -49,43 +111,49 @@ export function AuthorshipReport({ report, documentTitle }: AuthorshipReportProp
   ] as const;
 
   return (
-    <div className="print-report print-full-width space-y-4">
-      {documentTitle ? (
-        <p className="hidden print:block text-xl font-semibold">{documentTitle}</p>
-      ) : null}
+    <div className="print-report print-full-width">
+      <ReportPrintHeader
+        documentTitle={documentTitle}
+        generatedAtLabel={generatedAtLabel}
+        chainIsValid={report.chainIsValid}
+      />
 
-      <Card className="print:border print:border-border print:shadow-none">
-        <CardHeader>
+      <Card className="print:border-0 print:bg-transparent print:shadow-none">
+        <CardHeader className="print:hidden">
           <div className="flex items-start justify-between gap-4">
             <div>
               <CardTitle>Authorship Report</CardTitle>
               <CardDescription>
                 Verified drafting history summary
               </CardDescription>
+              <p className="mt-2 text-sm font-medium">{documentTitle}</p>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 flex-col items-end gap-2">
               <Badge variant={report.chainIsValid ? "secondary" : "destructive"}>
-                {report.chainIsValid
-                  ? "Verification passed"
-                  : "Verification failed"}
+                {verificationLabel}
               </Badge>
-              <ExportReportButton />
+              <ReportExportActions />
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-8">
-          <section className="grid gap-4 sm:grid-cols-2">
-            {summaryItems.map((item) => (
-              <Card key={item.label} size="sm" className="print:break-inside-avoid">
-                <CardHeader>
-                  <CardDescription>{item.label}</CardDescription>
-                  <CardTitle>{item.value}</CardTitle>
-                </CardHeader>
-              </Card>
-            ))}
+
+        <CardContent className="space-y-8 print:space-y-6 print:px-0 print:pt-0">
+          <section className="print:break-inside-avoid">
+            <h2 className="mb-4 text-sm font-medium print:hidden">Summary</h2>
+            <div className="grid gap-4 sm:grid-cols-2 print:hidden">
+              {summaryItems.map((item) => (
+                <Card key={item.label} size="sm">
+                  <CardHeader>
+                    <CardDescription>{item.label}</CardDescription>
+                    <CardTitle>{item.value}</CardTitle>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+            <PrintMetricGrid items={summaryItems} />
           </section>
 
-          <section className="space-y-4 print:break-inside-avoid">
+          <section className="space-y-4 print:hidden print:break-inside-avoid">
             <h2 className="text-sm font-medium">Event breakdown</h2>
             <div className="rounded-lg border border-border">
               {breakdownItems.map((item, index) => (
@@ -100,7 +168,9 @@ export function AuthorshipReport({ report, documentTitle }: AuthorshipReportProp
             </div>
           </section>
 
-          <section className="space-y-4 print:break-inside-avoid">
+          <PrintMetricTable title="Event breakdown" items={breakdownItems} />
+
+          <section className="space-y-4 print:hidden print:break-inside-avoid">
             <h2 className="text-sm font-medium">Integrity</h2>
             <div className="rounded-lg border border-border">
               {integrityItems.map((item, index) => (
@@ -121,17 +191,17 @@ export function AuthorshipReport({ report, documentTitle }: AuthorshipReportProp
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground print:hidden">
+            <p className="text-xs text-muted-foreground">
               This report provides evidence of the writing process, not absolute
               proof of authorship.
             </p>
           </section>
+
+          <PrintMetricTable title="Integrity" items={integrityItems} />
         </CardContent>
       </Card>
 
-      <p className="hidden text-sm text-muted-foreground print:block">
-        {REPORT_PRINT_DISCLAIMER}
-      </p>
+      <ReportPrintFooter />
     </div>
   );
 }

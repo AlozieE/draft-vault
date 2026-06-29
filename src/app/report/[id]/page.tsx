@@ -45,10 +45,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
             </p>
           </div>
         ) : (
-          <div className="space-y-4 print:space-y-0">
-            <p className="text-sm font-medium print:hidden">{document.title}</p>
-            <AuthorshipReport report={report} documentTitle={document.title} />
-          </div>
+          <AuthorshipReport report={report} documentTitle={document.title} />
         )}
       </div>
     </AppShell>
