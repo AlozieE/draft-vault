@@ -8,9 +8,11 @@ const navItems = [
   { href: "/sample-report", label: "Sample report" },
 ] as const;
 
+import { APP_NAV_ITEMS } from "@/lib/app-nav";
+
 export function AppSidebar() {
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-border bg-sidebar print:hidden">
+    <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-sidebar md:flex print:hidden">
       <div className="p-4">
         <p className="text-sm font-semibold text-sidebar-foreground">
           {APP_NAME}
@@ -18,7 +20,7 @@ export function AppSidebar() {
       </div>
       <Separator />
       <nav className="flex flex-col gap-1 p-2">
-        {navItems.map((item) => (
+        {APP_NAV_ITEMS.map((item) => (
           <Link
             key={item.href}
             href={item.href}

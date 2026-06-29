@@ -96,14 +96,14 @@ export function ReplayPlayer({ events }: ReplayPlayerProps) {
       : `Event ${Math.max(0, currentIndex + 1)} of ${events.length}`;
 
   return (
-    <Card>
+    <Card className="min-w-0 overflow-hidden">
       <CardHeader>
         <CardTitle>Replay Player</CardTitle>
         <CardDescription>{eventLabel}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="min-h-48 rounded-lg border border-border bg-muted/30 p-4">
-          <p className="whitespace-pre-wrap text-sm leading-relaxed">
+          <p className="max-w-full overflow-hidden text-sm leading-relaxed break-words whitespace-pre-wrap">
             {replayText || "Document replay will appear here."}
           </p>
         </div>

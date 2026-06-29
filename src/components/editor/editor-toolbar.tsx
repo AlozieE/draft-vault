@@ -12,7 +12,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   const disabled = editor === null;
 
   return (
-    <div className="flex flex-wrap items-center gap-1 border-b border-border p-2">
+    <div className="flex flex-wrap items-center gap-1 overflow-x-auto border-b border-border p-2">
       <Button
         type="button"
         variant="ghost"

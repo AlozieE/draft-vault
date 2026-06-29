@@ -64,10 +64,14 @@ export function DocumentDashboard({
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Your documents</h1>
-        <Button onClick={handleCreateDocument} disabled={isCreating}>
+    <div className="min-w-0 space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-xl font-semibold sm:text-2xl">Your documents</h1>
+        <Button
+          onClick={handleCreateDocument}
+          disabled={isCreating}
+          className="w-full sm:w-auto"
+        >
           {isCreating ? "Creating..." : "New document"}
         </Button>
       </div>
@@ -79,7 +83,7 @@ export function DocumentDashboard({
           </p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {documents.map((document) => (
             <DocumentCard
               key={document.id}

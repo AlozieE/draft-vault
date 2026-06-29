@@ -91,17 +91,17 @@ export function EditableDocumentTitle({
         onKeyDown={handleKeyDown}
         disabled={isSaving}
         aria-label="Document title"
-        className="max-w-xl text-2xl font-semibold"
+        className="max-w-full min-w-0 text-xl font-semibold sm:max-w-xl sm:text-2xl"
       />
     );
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex min-w-0 items-start gap-2">
       <button
         type="button"
         onClick={startEditing}
-        className="text-left text-2xl font-semibold hover:text-foreground/80"
+        className="min-w-0 break-words text-left text-xl font-semibold hover:text-foreground/80 sm:text-2xl"
       >
         {title}
       </button>

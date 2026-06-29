@@ -44,9 +44,9 @@ export function DocumentCard({
   onDelete,
 }: DocumentCardProps) {
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardHeader>
-        <CardTitle className="line-clamp-2">{title}</CardTitle>
+        <CardTitle className="line-clamp-2 break-words">{title}</CardTitle>
         <CardAction>
           <Badge variant="secondary">{status}</Badge>
         </CardAction>

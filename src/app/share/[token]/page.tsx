@@ -31,16 +31,18 @@ export default async function SharePage({ params }: SharePageProps) {
   const report = createAuthorshipReport(events, chainIsValid);
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border px-6 py-4 print:hidden">
+    <div className="min-h-screen min-w-0 overflow-x-hidden bg-background">
+      <header className="border-b border-border px-4 py-4 sm:px-6 print:hidden">
         <p className="text-sm text-muted-foreground">Draft Vault</p>
-        <h1 className="mt-1 text-2xl font-semibold">{shareLink.document.title}</h1>
+        <h1 className="mt-1 break-words text-xl font-semibold sm:text-2xl">
+          {shareLink.document.title}
+        </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Read-only authorship evidence
         </p>
       </header>
 
-      <main className="mx-auto max-w-3xl space-y-6 px-6 py-8 print:max-w-none print:px-0 print:py-0">
+      <main className="mx-auto min-w-0 max-w-3xl space-y-6 px-4 py-6 sm:px-6 sm:py-8 print:max-w-none print:px-0 print:py-0">
         {events.length === 0 ? (
           <div className="rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center print:hidden">
             <p className="text-sm text-muted-foreground">

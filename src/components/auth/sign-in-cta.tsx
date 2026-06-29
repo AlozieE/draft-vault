@@ -13,7 +13,9 @@ export function SignInCta() {
 
   return (
     <SignInButton mode="modal">
-      <Button variant="secondary">Sign in to start writing</Button>
+      <Button variant="secondary" className="w-full sm:w-auto">
+        Sign in to start writing
+      </Button>
     </SignInButton>
   );
 }

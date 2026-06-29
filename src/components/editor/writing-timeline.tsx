@@ -38,14 +38,17 @@ export function WritingTimeline({
   deleteEventsControl,
 }: WritingTimelineProps) {
   return (
-    <Card className="flex h-full min-h-0 flex-col gap-0 overflow-hidden pb-0 pt-(--card-spacing)">
+    <Card className="flex h-full min-h-0 min-w-0 flex-col gap-0 overflow-hidden pb-0 pt-(--card-spacing)">
       <CardHeader className="shrink-0 pt-0">
-        <div className="flex items-start justify-between gap-2">
-          <div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
             <CardTitle>Writing Timeline</CardTitle>
             <CardDescription>Recent events for this session</CardDescription>
           </div>
-          <Badge variant={chainIsValid ? "secondary" : "destructive"}>
+          <Badge
+            variant={chainIsValid ? "secondary" : "destructive"}
+            className="w-fit shrink-0"
+          >
             {chainIsValid ? "Verification passed" : "Verification failed"}
           </Badge>
         </div>
@@ -76,7 +79,7 @@ export function WritingTimeline({
                       {formatContentLengthChange(event.contentLengthChange)}
                     </span>
                     <span>Words: {event.wordCount}</span>
-                    <span className="font-mono">
+                    <span className="break-all font-mono">
                       Hash: {shortenEventHash(event.eventHash)}
                     </span>
                   </div>
