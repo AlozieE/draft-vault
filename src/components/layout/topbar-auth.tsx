@@ -1,24 +1,25 @@
-import {
-  Show,
-  SignInButton,
-  UserButton,
-} from "@clerk/nextjs";
+"use client";
+
+import { SignInButton, useAuth, UserButton } from "@clerk/nextjs";
 
 import { Button } from "@/components/ui/button";
 
-export async function TopbarAuth() {
+export function TopbarAuth() {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  if (!isLoaded) {
+    return <span aria-hidden="true" className="inline-block size-8" />;
+  }
+
+  if (isSignedIn) {
+    return <UserButton />;
+  }
+
   return (
-    <>
-      <Show when="signed-out">
-        <SignInButton mode="modal">
-          <Button variant="secondary" size="sm">
-            Sign in
-          </Button>
-        </SignInButton>
-      </Show>
-      <Show when="signed-in">
-        <UserButton />
-      </Show>
-    </>
+    <SignInButton mode="modal">
+      <Button variant="secondary" size="sm">
+        Sign in
+      </Button>
+    </SignInButton>
   );
 }

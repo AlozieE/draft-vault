@@ -1,13 +1,19 @@
-import { Show, SignInButton } from "@clerk/nextjs";
+"use client";
+
+import { SignInButton, useAuth } from "@clerk/nextjs";
 
 import { Button } from "@/components/ui/button";
 
-export async function SignInCta() {
+export function SignInCta() {
+  const { isLoaded, isSignedIn } = useAuth();
+
+  if (!isLoaded || isSignedIn) {
+    return null;
+  }
+
   return (
-    <Show when="signed-out">
-      <SignInButton mode="modal">
-        <Button variant="secondary">Sign in to start writing</Button>
-      </SignInButton>
-    </Show>
+    <SignInButton mode="modal">
+      <Button variant="secondary">Sign in to start writing</Button>
+    </SignInButton>
   );
 }

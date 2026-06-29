@@ -2,6 +2,7 @@
 
 import { useCallback } from "react";
 
+import { DeleteEventsDialog } from "@/components/editor/delete-events-dialog";
 import { WritingEditor } from "@/components/editor/writing-editor";
 import { WritingTimeline } from "@/components/editor/writing-timeline";
 import {
@@ -9,18 +10,25 @@ import {
   useDocumentAutosave,
 } from "@/hooks/use-document-autosave";
 import { usePersistedWritingEvents } from "@/hooks/use-persisted-writing-events";
+import {
+  DELETE_WRITING_EVENTS_DESCRIPTION,
+  DEMO_TIMELINE_DELETE_LABEL,
+  RECORDED_EVENTS_DELETE_LABEL,
+} from "@/lib/audit-log";
 import type { WritingEvent, WritingEventInput } from "@/types/writing-event";
 
 type DocumentEditorWorkspaceProps = {
   documentId: string;
   initialContent?: string;
   initialEvents?: WritingEvent[];
+  isDemoDocument?: boolean;
 };
 
 export function DocumentEditorWorkspace({
   documentId,
   initialContent,
   initialEvents,
+  isDemoDocument = false,
 }: DocumentEditorWorkspaceProps) {
   const { autosaveStatus, handleContentChange } =
     useDocumentAutosave(documentId);
@@ -39,9 +47,20 @@ export function DocumentEditorWorkspace({
     [addWritingEvents, documentId],
   );
 
-  const handleClearTimeline = useCallback(() => {
-    clearEvents();
-  }, [clearEvents]);
+  const handleDeleteEvents = useCallback(
+    async (targetDocumentId: string) => {
+      if (targetDocumentId !== documentId) {
+        return;
+      }
+
+      await clearEvents();
+    },
+    [clearEvents, documentId],
+  );
+
+  const deleteEventsLabel = isDemoDocument
+    ? DEMO_TIMELINE_DELETE_LABEL
+    : RECORDED_EVENTS_DELETE_LABEL;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
@@ -62,7 +81,15 @@ export function DocumentEditorWorkspace({
             events={events}
             chainIsValid={chainIsValid}
             isLoading={isLoading}
-            onClear={handleClearTimeline}
+            deleteEventsControl={
+              <DeleteEventsDialog
+                documentId={documentId}
+                label={deleteEventsLabel}
+                description={DELETE_WRITING_EVENTS_DESCRIPTION}
+                onConfirm={handleDeleteEvents}
+                disabled={isLoading || events.length === 0}
+              />
+            }
           />
         </div>
       </div>

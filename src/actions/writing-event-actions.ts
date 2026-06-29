@@ -93,10 +93,21 @@ export async function createWritingEventRecord(
   return mapWritingEventRecordToWritingEvent(event);
 }
 
-export async function clearWritingEvents(documentId: string): Promise<void> {
-  await assertDocumentOwnership(documentId);
+export async function clearWritingEvents(
+  documentId: string,
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    await assertDocumentOwnership(documentId);
 
-  await prisma.writingEvent.deleteMany({
-    where: { documentId },
-  });
+    await prisma.writingEvent.deleteMany({
+      where: { documentId },
+    });
+
+    return { success: true };
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to delete writing events";
+
+    return { success: false, error: message };
+  }
 }
