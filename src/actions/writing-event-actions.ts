@@ -1,5 +1,6 @@
 "use server";
 
+import { assertDocumentOwnership } from "@/lib/document-ownership";
 import { prisma } from "@/lib/prisma";
 import {
   mapWritingEventRecordToWritingEvent,
@@ -24,9 +25,7 @@ export type CreateWritingEventRecordInput = {
   eventHash: string;
 };
 
-export async function getWritingEvents(
-  documentId: string,
-): Promise<WritingEvent[]> {
+async function loadWritingEvents(documentId: string): Promise<WritingEvent[]> {
   const events = await prisma.writingEvent.findMany({
     where: { documentId },
     orderBy: [{ timestamp: "asc" }, { createdAt: "asc" }],
@@ -35,10 +34,25 @@ export async function getWritingEvents(
   return mapWritingEventRecordsToWritingEvents(events);
 }
 
+export async function getWritingEvents(
+  documentId: string,
+): Promise<WritingEvent[]> {
+  await assertDocumentOwnership(documentId);
+  return loadWritingEvents(documentId);
+}
+
+export async function getWritingEventsForSharedDocument(
+  documentId: string,
+): Promise<WritingEvent[]> {
+  return loadWritingEvents(documentId);
+}
+
 export async function getRecentWritingEvents(
   documentId: string,
   limit = 50,
 ): Promise<WritingEvent[]> {
+  await assertDocumentOwnership(documentId);
+
   const events = await prisma.writingEvent.findMany({
     where: { documentId },
     orderBy: [{ timestamp: "desc" }, { createdAt: "desc" }],
@@ -51,6 +65,8 @@ export async function getRecentWritingEvents(
 export async function createWritingEventRecord(
   input: CreateWritingEventRecordInput,
 ): Promise<WritingEvent> {
+  await assertDocumentOwnership(input.documentId);
+
   const event = await prisma.writingEvent.create({
     data: {
       id: input.id,
@@ -78,6 +94,8 @@ export async function createWritingEventRecord(
 }
 
 export async function clearWritingEvents(documentId: string): Promise<void> {
+  await assertDocumentOwnership(documentId);
+
   await prisma.writingEvent.deleteMany({
     where: { documentId },
   });

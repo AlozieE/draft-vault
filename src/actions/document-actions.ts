@@ -1,7 +1,11 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
 import { mapDashboardDocument, mapDocument } from "@/lib/db-mappers";
+import {
+  findOwnedDocument,
+  getCurrentUserId,
+} from "@/lib/document-ownership";
+import { prisma } from "@/lib/prisma";
 import type {
   Document,
   DocumentEditorData,
@@ -11,8 +15,10 @@ import type {
 const DEMO_DOCUMENT_TITLE = "Demo Document";
 
 export async function getOrCreateDemoDocument(): Promise<Document> {
+  const ownerId = await getCurrentUserId();
+
   const existingDocument = await prisma.document.findFirst({
-    where: { title: DEMO_DOCUMENT_TITLE },
+    where: { title: DEMO_DOCUMENT_TITLE, ownerId },
   });
 
   if (existingDocument) {
@@ -23,6 +29,7 @@ export async function getOrCreateDemoDocument(): Promise<Document> {
     data: {
       title: DEMO_DOCUMENT_TITLE,
       content: "<p>Start writing your draft here...</p>",
+      ownerId,
     },
   });
 
@@ -32,9 +39,7 @@ export async function getOrCreateDemoDocument(): Promise<Document> {
 export async function getDocumentById(
   documentId: string,
 ): Promise<Document | null> {
-  const document = await prisma.document.findUnique({
-    where: { id: documentId },
-  });
+  const document = await findOwnedDocument(documentId);
 
   if (!document) {
     return null;
@@ -46,24 +51,24 @@ export async function getDocumentById(
 export async function getDocumentForEditor(
   documentId: string,
 ): Promise<DocumentEditorData | null> {
-  const document = await prisma.document.findUnique({
-    where: { id: documentId },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-    },
-  });
+  const document = await findOwnedDocument(documentId);
 
   if (!document) {
     return null;
   }
 
-  return document;
+  return {
+    id: document.id,
+    title: document.title,
+    content: document.content,
+  };
 }
 
 export async function getDocuments(): Promise<DocumentListItem[]> {
+  const ownerId = await getCurrentUserId();
+
   const documents = await prisma.document.findMany({
+    where: { ownerId },
     select: {
       id: true,
       title: true,
@@ -80,10 +85,13 @@ export async function getDocuments(): Promise<DocumentListItem[]> {
 }
 
 export async function createDocument(title: string): Promise<Document> {
+  const ownerId = await getCurrentUserId();
+
   const document = await prisma.document.create({
     data: {
       title,
       content: "",
+      ownerId,
     },
   });
 
@@ -91,6 +99,12 @@ export async function createDocument(title: string): Promise<Document> {
 }
 
 export async function deleteDocument(documentId: string): Promise<void> {
+  const document = await findOwnedDocument(documentId);
+
+  if (!document) {
+    throw new Error("Document not found");
+  }
+
   await prisma.document.delete({
     where: { id: documentId },
   });
@@ -100,24 +114,36 @@ export async function updateDocumentContent(
   documentId: string,
   content: string,
 ): Promise<Document> {
-  const document = await prisma.document.update({
+  const document = await findOwnedDocument(documentId);
+
+  if (!document) {
+    throw new Error("Document not found");
+  }
+
+  const updatedDocument = await prisma.document.update({
     where: { id: documentId },
     data: { content },
   });
 
-  return mapDocument(document);
+  return mapDocument(updatedDocument);
 }
 
 export async function updateDocumentTitle(
   documentId: string,
   title: string,
 ): Promise<Document> {
+  const document = await findOwnedDocument(documentId);
+
+  if (!document) {
+    throw new Error("Document not found");
+  }
+
   const normalizedTitle = title.trim() || "Untitled Document";
 
-  const document = await prisma.document.update({
+  const updatedDocument = await prisma.document.update({
     where: { id: documentId },
     data: { title: normalizedTitle },
   });
 
-  return mapDocument(document);
+  return mapDocument(updatedDocument);
 }

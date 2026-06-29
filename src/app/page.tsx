@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock, FileCheck, Shield } from "lucide-react";
 
+import { SignInCta } from "@/components/auth/sign-in-cta";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -47,6 +48,7 @@ export default function HomePage() {
             tamper-evident authorship reports when your work is questioned.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
+            <SignInCta />
             <Button asChild>
               <Link href="/dashboard">Open Dashboard</Link>
             </Button>
