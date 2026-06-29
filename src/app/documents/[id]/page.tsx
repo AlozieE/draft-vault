@@ -3,6 +3,7 @@ import {
   getOrCreateDemoDocument,
 } from "@/actions/document-actions";
 import { EditableDocumentTitle } from "@/components/documents/editable-document-title";
+import { ShareLinkButton } from "@/components/documents/share-link-button";
 import { DocumentEditorWorkspace } from "@/components/editor/document-editor-workspace";
 import { AppShell } from "@/components/layout/app-shell";
 
@@ -19,11 +20,12 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
     <AppShell>
       {document ? (
         <div className="flex h-[calc(100vh-6.5rem)] min-h-0 flex-col gap-6">
-          <div className="shrink-0">
+          <div className="flex shrink-0 items-start justify-between gap-4">
             <EditableDocumentTitle
               documentId={document.id}
               initialTitle={document.title}
             />
+            <ShareLinkButton documentId={document.id} />
           </div>
           <DocumentEditorWorkspace
             documentId={document.id}
