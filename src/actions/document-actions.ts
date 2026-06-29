@@ -75,3 +75,17 @@ export async function updateDocumentContent(
 
   return mapDocument(document);
 }
+
+export async function updateDocumentTitle(
+  documentId: string,
+  title: string,
+): Promise<Document> {
+  const normalizedTitle = title.trim() || "Untitled Document";
+
+  const document = await prisma.document.update({
+    where: { id: documentId },
+    data: { title: normalizedTitle },
+  });
+
+  return mapDocument(document);
+}

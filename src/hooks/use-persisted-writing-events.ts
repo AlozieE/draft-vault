@@ -73,6 +73,7 @@ export function usePersistedWritingEvents(documentId: string) {
 
           try {
             const savedEvent = await createWritingEventRecord({
+              id: event.id,
               documentId: event.documentId,
               type: event.type,
               timestamp: event.timestamp,

@@ -42,7 +42,7 @@ export default async function ReplayPage({ params }: ReplayPageProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">{document.title}</p>
+            <p className="text-sm font-medium">{document.title}</p>
             <ReplayPlayer events={events} />
           </div>
         )}

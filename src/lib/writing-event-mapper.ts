@@ -1,5 +1,6 @@
 import type { WritingEvent as PrismaWritingEvent } from "@prisma/client";
 
+import { toIsoTimestamp } from "@/lib/hash-chain";
 import type { WritingEvent, WritingEventType } from "@/types/writing-event";
 
 const WRITING_EVENT_TYPES = new Set<WritingEventType>([
@@ -8,10 +9,6 @@ const WRITING_EVENT_TYPES = new Set<WritingEventType>([
   "paste",
   "snapshot",
 ]);
-
-function toIsoTimestamp(timestamp: Date | string): string {
-  return timestamp instanceof Date ? timestamp.toISOString() : timestamp;
-}
 
 function toWritingEventType(type: string): WritingEventType {
   if (WRITING_EVENT_TYPES.has(type as WritingEventType)) {

@@ -46,7 +46,7 @@ export default async function ReportPage({ params }: ReportPageProps) {
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">{document.title}</p>
+            <p className="text-sm font-medium">{document.title}</p>
             <AuthorshipReport report={report} />
           </div>
         )}

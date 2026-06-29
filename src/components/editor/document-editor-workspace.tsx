@@ -48,26 +48,19 @@ export function DocumentEditorWorkspace({
   );
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Document Editor</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{document.title}</p>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <WritingEditor
-          documentId={document.id}
-          initialContent={document.content}
-          onWritingEvent={handleWritingEvent}
-          onContentChange={handleContentChange}
-        />
-        <WritingTimeline
-          events={events}
-          chainIsValid={chainIsValid}
-          isLoading={isLoading}
-          onClear={handleClearTimeline}
-        />
-      </div>
+    <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+      <WritingEditor
+        documentId={document.id}
+        initialContent={document.content}
+        onWritingEvent={handleWritingEvent}
+        onContentChange={handleContentChange}
+      />
+      <WritingTimeline
+        events={events}
+        chainIsValid={chainIsValid}
+        isLoading={isLoading}
+        onClear={handleClearTimeline}
+      />
     </div>
   );
 }

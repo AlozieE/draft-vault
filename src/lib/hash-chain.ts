@@ -1,5 +1,54 @@
 import { GENESIS_HASH } from "@/lib/constants";
-import type { WritingEvent } from "@/types/writing-event";
+import type { WritingEvent, WritingEventType } from "@/types/writing-event";
+
+export type HashableEventData = {
+  id: string;
+  documentId: string;
+  type: WritingEventType;
+  timestamp: string;
+  contentLengthChange: number;
+  wordCount: number;
+  characterCount: number;
+  textPreview?: string;
+  previousHash: string;
+};
+
+type HashableEventInput = {
+  id: string;
+  documentId: string;
+  type: WritingEventType;
+  timestamp: string | Date;
+  contentLengthChange: number;
+  wordCount: number;
+  characterCount: number;
+  textPreview?: string | null;
+  previousHash: string;
+};
+
+export function toIsoTimestamp(timestamp: string | Date): string {
+  return timestamp instanceof Date ? timestamp.toISOString() : timestamp;
+}
+
+export function getHashableEventData(
+  event: HashableEventInput,
+): HashableEventData {
+  const hashable: HashableEventData = {
+    id: event.id,
+    documentId: event.documentId,
+    type: event.type,
+    timestamp: toIsoTimestamp(event.timestamp),
+    contentLengthChange: event.contentLengthChange,
+    wordCount: event.wordCount,
+    characterCount: event.characterCount,
+    previousHash: event.previousHash,
+  };
+
+  if (event.textPreview != null) {
+    hashable.textPreview = event.textPreview;
+  }
+
+  return hashable;
+}
 
 export async function createSha256Hash(input: string): Promise<string> {
   const encodedInput = new TextEncoder().encode(input);
@@ -11,20 +60,9 @@ export async function createSha256Hash(input: string): Promise<string> {
 }
 
 export async function createEventHash(
-  eventData: object,
-  previousHash: string,
+  event: HashableEventInput,
 ): Promise<string> {
-  return createSha256Hash(JSON.stringify({ ...eventData, previousHash }));
-}
-
-function getEventDataForHash(event: WritingEvent): object {
-  const {
-    eventHash: _eventHash,
-    previousHash: _previousHash,
-    ...eventData
-  } = event;
-
-  return eventData;
+  return createSha256Hash(JSON.stringify(getHashableEventData(event)));
 }
 
 export async function verifyEventChain(
@@ -42,10 +80,7 @@ export async function verifyEventChain(
       return false;
     }
 
-    const expectedHash = await createEventHash(
-      getEventDataForHash(event),
-      event.previousHash,
-    );
+    const expectedHash = await createEventHash(event);
 
     if (event.eventHash !== expectedHash) {
       return false;

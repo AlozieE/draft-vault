@@ -8,6 +8,7 @@ import {
 import type { WritingEvent, WritingEventType } from "@/types/writing-event";
 
 export type CreateWritingEventRecordInput = {
+  id: string;
   documentId: string;
   type: WritingEventType;
   timestamp: string;
@@ -35,6 +36,7 @@ export async function createWritingEventRecord(
 ): Promise<WritingEvent> {
   const event = await prisma.writingEvent.create({
     data: {
+      id: input.id,
       documentId: input.documentId,
       type: input.type,
       timestamp: new Date(input.timestamp),

@@ -2,6 +2,7 @@ import {
   getDocumentById,
   getOrCreateDemoDocument,
 } from "@/actions/document-actions";
+import { EditableDocumentTitle } from "@/components/documents/editable-document-title";
 import { DocumentEditorWorkspace } from "@/components/editor/document-editor-workspace";
 import { AppShell } from "@/components/layout/app-shell";
 
@@ -17,7 +18,13 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
   return (
     <AppShell>
       {document ? (
-        <DocumentEditorWorkspace document={document} />
+        <div className="space-y-6">
+          <EditableDocumentTitle
+            documentId={document.id}
+            initialTitle={document.title}
+          />
+          <DocumentEditorWorkspace document={document} />
+        </div>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center py-24">
           <h1 className="text-2xl font-semibold">Document not found</h1>

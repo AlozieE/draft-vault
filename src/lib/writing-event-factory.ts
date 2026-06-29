@@ -24,13 +24,13 @@ export async function createWritingEvent({
     wordCount,
     characterCount,
     ...(textPreview !== undefined ? { textPreview } : {}),
+    previousHash,
   };
 
-  const eventHash = await createEventHash(eventData, previousHash);
+  const eventHash = await createEventHash(eventData);
 
   return {
     ...eventData,
-    previousHash,
     eventHash,
   };
 }
