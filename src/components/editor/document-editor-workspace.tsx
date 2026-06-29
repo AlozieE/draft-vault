@@ -42,23 +42,27 @@ export function DocumentEditorWorkspace({
   }, [clearEvents]);
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">
+    <div className="flex min-h-0 flex-1 flex-col gap-3">
+      <p className="shrink-0 text-sm text-muted-foreground">
         {getAutosaveStatusLabel(autosaveStatus)}
       </p>
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <WritingEditor
-          documentId={documentId}
-          initialContent={initialContent}
-          onWritingEvents={handleWritingEvents}
-          onContentChange={handleContentChange}
-        />
-        <WritingTimeline
-          events={events}
-          chainIsValid={chainIsValid}
-          isLoading={isLoading}
-          onClear={handleClearTimeline}
-        />
+      <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(18rem,1fr)_minmax(12rem,20rem)] gap-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:grid-rows-1">
+        <div className="flex min-h-0 flex-col">
+          <WritingEditor
+            documentId={documentId}
+            initialContent={initialContent}
+            onWritingEvents={handleWritingEvents}
+            onContentChange={handleContentChange}
+          />
+        </div>
+        <div className="flex min-h-0 flex-col">
+          <WritingTimeline
+            events={events}
+            chainIsValid={chainIsValid}
+            isLoading={isLoading}
+            onClear={handleClearTimeline}
+          />
+        </div>
       </div>
     </div>
   );

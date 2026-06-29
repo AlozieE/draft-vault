@@ -18,11 +18,13 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
   return (
     <AppShell>
       {document ? (
-        <div className="space-y-6">
-          <EditableDocumentTitle
-            documentId={document.id}
-            initialTitle={document.title}
-          />
+        <div className="flex h-[calc(100vh-6.5rem)] min-h-0 flex-col gap-6">
+          <div className="shrink-0">
+            <EditableDocumentTitle
+              documentId={document.id}
+              initialTitle={document.title}
+            />
+          </div>
           <DocumentEditorWorkspace
             documentId={document.id}
             initialContent={document.content}

@@ -44,8 +44,8 @@ export function WritingTimeline({
   onClear,
 }: WritingTimelineProps) {
   return (
-    <Card>
-      <CardHeader>
+    <Card className="flex h-full min-h-0 flex-col gap-0 overflow-hidden pb-0 pt-(--card-spacing)">
+      <CardHeader className="shrink-0 pt-0">
         <div className="flex items-start justify-between gap-2">
           <div>
             <CardTitle>Writing Timeline</CardTitle>
@@ -67,7 +67,7 @@ export function WritingTimeline({
           </Button>
         ) : null}
       </CardHeader>
-      <CardContent>
+      <CardContent className="min-h-0 flex-1 overflow-y-auto pb-(--card-spacing)">
         {isLoading ? (
           <p className="text-sm text-muted-foreground">Loading timeline...</p>
         ) : events.length === 0 ? (
@@ -87,7 +87,8 @@ export function WritingTimeline({
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                     <span>
-                      Change: {formatContentLengthChange(event.contentLengthChange)}
+                      Change:{" "}
+                      {formatContentLengthChange(event.contentLengthChange)}
                     </span>
                     <span>Words: {event.wordCount}</span>
                     <span className="font-mono">

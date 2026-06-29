@@ -17,7 +17,7 @@ import type { WritingEventInput, WritingEventType } from "@/types/writing-event"
 const defaultContent = "<p>Start writing your draft here...</p>";
 
 const editorContentClass = cn(
-  "min-h-[500px] w-full bg-background px-8 py-6 text-base leading-relaxed outline-none",
+  "min-h-[12rem] w-full bg-background px-8 py-6 text-base leading-relaxed outline-none",
   "[&_h2]:mb-3 [&_h2]:mt-6 [&_h2]:text-xl [&_h2]:font-semibold",
   "[&_p]:mb-3",
   "[&_ul]:mb-3 [&_ul]:list-disc [&_ul]:pl-6",
@@ -129,9 +129,11 @@ export function WritingEditor({
   });
 
   return (
-    <Card className="overflow-hidden">
-      <EditorToolbar editor={editor} />
-      <CardContent className="p-0">
+    <Card className="flex h-full min-h-0 flex-col gap-0 overflow-hidden pb-0 pt-(--card-spacing)">
+      <div className="shrink-0">
+        <EditorToolbar editor={editor} />
+      </div>
+      <CardContent className="min-h-0 flex-1 overflow-y-auto p-0">
         <div className="mx-auto max-w-3xl">
           <EditorContent editor={editor} />
         </div>
