@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { createShareLink } from "@/actions/share-link-actions";
 import { Button } from "@/components/ui/button";
+import { logError } from "@/lib/log-error";
 import { buildShareUrl } from "@/lib/app-url";
 
 type ShareLinkButtonProps = {
@@ -32,7 +33,7 @@ export function ShareLinkButton({ documentId }: ShareLinkButtonProps) {
         setStatusMessage("Share link created");
       }
     } catch (error: unknown) {
-      console.error("Failed to create share link:", error);
+      logError("Failed to create share link:", error);
       setStatusMessage("Failed to create share link");
     } finally {
       setIsCreating(false);

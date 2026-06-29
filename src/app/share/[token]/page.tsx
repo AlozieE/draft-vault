@@ -11,8 +11,22 @@ type SharePageProps = {
 
 export const dynamic = "force-dynamic";
 
+const TOKEN_PATTERN = /^[a-f0-9]{32}$/;
+
 export default async function SharePage({ params }: SharePageProps) {
   const { token } = await params;
+
+  if (!TOKEN_PATTERN.test(token)) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
+        <h1 className="text-2xl font-semibold">Share link not found</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          This link may be invalid or expired.
+        </p>
+      </div>
+    );
+  }
+
   const shareLink = await getShareLinkByToken(token);
 
   if (!shareLink) {

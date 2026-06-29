@@ -9,6 +9,7 @@ import {
 } from "@/actions/writing-event-actions";
 import { GENESIS_HASH } from "@/lib/constants";
 import { verifyEventChain } from "@/lib/hash-chain";
+import { logError } from "@/lib/log-error";
 import { createWritingEvent } from "@/lib/writing-event-factory";
 import type { WritingEvent, WritingEventInput } from "@/types/writing-event";
 
@@ -87,7 +88,7 @@ export function usePersistedWritingEvents(
           await verifyEventChain(loadedEvents, { validateGenesisLink: false }),
         );
       } catch (error: unknown) {
-        console.error("Failed to load writing events:", error);
+        logError("Failed to load writing events:", error);
       } finally {
         if (!isCancelled) {
           setIsLoading(false);
@@ -139,7 +140,7 @@ export function usePersistedWritingEvents(
                   validateGenesisLink: false,
                 }),
               );
-              console.error("Failed to save writing event:", error);
+              logError("Failed to save writing event:", error);
               return;
             }
           }
@@ -151,7 +152,7 @@ export function usePersistedWritingEvents(
           );
         })
         .catch((error: unknown) => {
-          console.error("Failed to append writing events:", error);
+          logError("Failed to append writing events:", error);
         });
     },
     [documentId, recentEventLimit],
@@ -172,7 +173,7 @@ export function usePersistedWritingEvents(
         const result = await clearWritingEventsFromDb(documentId);
 
         if (!result.success) {
-          console.error("Failed to clear writing events:", result.error);
+          logError("Failed to clear writing events:", result.error);
           return;
         }
 
@@ -181,7 +182,7 @@ export function usePersistedWritingEvents(
         setChainIsValid(true);
         succeeded = true;
       } catch (error: unknown) {
-        console.error("Failed to clear writing events:", error);
+        logError("Failed to clear writing events:", error);
       }
     }));
 

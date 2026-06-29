@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { createDocument, deleteDocument } from "@/actions/document-actions";
 import { DocumentCard } from "@/components/documents/document-card";
 import { Button } from "@/components/ui/button";
+import { logError } from "@/lib/log-error";
 import type { DocumentListItem } from "@/types/document";
 
 type DocumentDashboardProps = {
@@ -57,7 +58,7 @@ export function DocumentDashboard({
         current.filter((document) => document.id !== documentId),
       );
     } catch (error: unknown) {
-      console.error("Failed to delete document:", error);
+      logError("Failed to delete document:", error);
     } finally {
       setDeletingDocumentId(null);
     }

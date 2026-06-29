@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { updateDocumentContent } from "@/actions/document-actions";
+import { logError } from "@/lib/log-error";
 
 export type AutosaveStatus = "saved" | "saving" | "unsaved";
 
@@ -38,7 +39,7 @@ export function useDocumentAutosave(documentId: string) {
             await updateDocumentContent(documentId, latestContentRef.current);
             setAutosaveStatus("saved");
           } catch (error: unknown) {
-            console.error("Failed to autosave document content:", error);
+            logError("Failed to autosave document content:", error);
             setAutosaveStatus("unsaved");
           }
         })();

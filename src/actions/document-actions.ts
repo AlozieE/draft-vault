@@ -12,6 +12,9 @@ import type {
   DocumentListItem,
 } from "@/types/document";
 
+const TITLE_MAX_LENGTH = 255;
+const CONTENT_MAX_BYTES = 500 * 1024;
+
 
 export async function getDocumentById(
   documentId: string,
@@ -64,9 +67,14 @@ export async function getDocuments(): Promise<DocumentListItem[]> {
 export async function createDocument(title: string): Promise<Document> {
   const ownerId = await getCurrentUserId();
 
+  const normalizedTitle = title.trim() || "Untitled Document";
+  if (normalizedTitle.length > TITLE_MAX_LENGTH) {
+    throw new Error("Title must be 255 characters or fewer");
+  }
+
   const document = await prisma.document.create({
     data: {
-      title,
+      title: normalizedTitle,
       content: "",
       ownerId,
     },
@@ -97,6 +105,10 @@ export async function updateDocumentContent(
     throw new Error("Document not found");
   }
 
+  if (new TextEncoder().encode(content).length > CONTENT_MAX_BYTES) {
+    throw new Error("Document content exceeds maximum size of 500 KB");
+  }
+
   const updatedDocument = await prisma.document.update({
     where: { id: documentId },
     data: { content },
@@ -116,6 +128,9 @@ export async function updateDocumentTitle(
   }
 
   const normalizedTitle = title.trim() || "Untitled Document";
+  if (normalizedTitle.length > TITLE_MAX_LENGTH) {
+    throw new Error("Title must be 255 characters or fewer");
+  }
 
   const updatedDocument = await prisma.document.update({
     where: { id: documentId },
