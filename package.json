@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "test:replay": "npx --yes tsx tests/replay-engine.test.mts"
+    "test:replay": "npx --yes tsx tests/replay-engine.test.mts",
+    "test": "vitest"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -35,6 +36,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.6"
   }
 }
