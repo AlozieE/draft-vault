@@ -1,6 +1,7 @@
 "use server";
 
 import { findOwnedDocument } from "@/lib/document-ownership";
+import { rateLimitByUser } from "@/lib/rate-limit";
 import {
   mapShareLink,
   mapShareLinkWithDocument,
@@ -13,6 +14,7 @@ function generateShareToken(): string {
 }
 
 export async function createShareLink(documentId: string): Promise<ShareLink> {
+  await rateLimitByUser();
   const document = await findOwnedDocument(documentId);
 
   if (!document) {

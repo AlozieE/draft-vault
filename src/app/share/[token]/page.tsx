@@ -4,6 +4,7 @@ import { AuthorshipReport } from "@/components/report/authorship-report";
 import { ReplayPlayer } from "@/components/replay/replay-player";
 import { verifyEventChain } from "@/lib/hash-chain";
 import { createAuthorshipReport } from "@/lib/report-metrics";
+import { isSharePageRateLimited } from "@/lib/rate-limit";
 
 type SharePageProps = {
   params: Promise<{ token: string }>;
@@ -15,6 +16,18 @@ const TOKEN_PATTERN = /^[a-f0-9]{32}$/;
 
 export default async function SharePage({ params }: SharePageProps) {
   const { token } = await params;
+
+  if (await isSharePageRateLimited()) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center px-6 py-24">
+        <h1 className="text-2xl font-semibold">Too many requests</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          You&apos;re viewing this page too quickly. Please wait a moment and
+          try again.
+        </p>
+      </div>
+    );
+  }
 
   if (!TOKEN_PATTERN.test(token)) {
     return (

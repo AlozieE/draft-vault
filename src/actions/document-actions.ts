@@ -5,6 +5,10 @@ import {
   findOwnedDocument,
   getCurrentUserId,
 } from "@/lib/document-ownership";
+import {
+  rateLimitByUser,
+  rateLimitByUserAndDocument,
+} from "@/lib/rate-limit";
 import { prisma } from "@/lib/prisma";
 import type {
   Document,
@@ -45,6 +49,7 @@ export async function getDocumentForEditor(
 }
 
 export async function getDocuments(): Promise<DocumentListItem[]> {
+  await rateLimitByUser();
   const ownerId = await getCurrentUserId();
 
   const documents = await prisma.document.findMany({
@@ -65,6 +70,7 @@ export async function getDocuments(): Promise<DocumentListItem[]> {
 }
 
 export async function createDocument(title: string): Promise<Document> {
+  await rateLimitByUser();
   const ownerId = await getCurrentUserId();
 
   const normalizedTitle = title.trim() || "Untitled Document";
@@ -84,6 +90,7 @@ export async function createDocument(title: string): Promise<Document> {
 }
 
 export async function deleteDocument(documentId: string): Promise<void> {
+  await rateLimitByUser();
   const document = await findOwnedDocument(documentId);
 
   if (!document) {
@@ -99,6 +106,7 @@ export async function updateDocumentContent(
   documentId: string,
   content: string,
 ): Promise<Document> {
+  await rateLimitByUserAndDocument(documentId);
   const document = await findOwnedDocument(documentId);
 
   if (!document) {
@@ -121,6 +129,7 @@ export async function updateDocumentTitle(
   documentId: string,
   title: string,
 ): Promise<Document> {
+  await rateLimitByUserAndDocument(documentId);
   const document = await findOwnedDocument(documentId);
 
   if (!document) {

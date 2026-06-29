@@ -1,6 +1,7 @@
 "use server";
 
 import { assertDocumentOwnership } from "@/lib/document-ownership";
+import { rateLimitByUser, rateLimitWritingEvent } from "@/lib/rate-limit";
 import { createEventHash } from "@/lib/hash-chain";
 import { prisma } from "@/lib/prisma";
 import {
@@ -70,6 +71,7 @@ export async function getRecentWritingEvents(
 export async function createWritingEventRecord(
   input: CreateWritingEventRecordInput,
 ): Promise<WritingEvent> {
+  await rateLimitWritingEvent(input.documentId);
   await assertDocumentOwnership(input.documentId);
 
   if (input.textPreview && input.textPreview.length > TEXT_PREVIEW_MAX_CHARS) {
@@ -137,6 +139,7 @@ export async function clearWritingEvents(
   documentId: string,
 ): Promise<{ success: true } | { success: false; error: string }> {
   try {
+    await rateLimitByUser();
     await assertDocumentOwnership(documentId);
 
     await prisma.writingEvent.deleteMany({
