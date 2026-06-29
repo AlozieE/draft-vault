@@ -1,7 +1,8 @@
 import {
-  getDocumentById,
+  getDocumentForEditor,
   getOrCreateDemoDocument,
 } from "@/actions/document-actions";
+import { getRecentWritingEvents } from "@/actions/writing-event-actions";
 import { EditableDocumentTitle } from "@/components/documents/editable-document-title";
 import { ShareLinkButton } from "@/components/documents/share-link-button";
 import { DocumentEditorWorkspace } from "@/components/editor/document-editor-workspace";
@@ -11,10 +12,15 @@ type DocumentPageProps = {
   params: Promise<{ id: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function DocumentPage({ params }: DocumentPageProps) {
   const { id } = await params;
   const document =
-    id === "demo" ? await getOrCreateDemoDocument() : await getDocumentById(id);
+    id === "demo" ? await getOrCreateDemoDocument() : await getDocumentForEditor(id);
+  const initialEvents = document
+    ? await getRecentWritingEvents(document.id)
+    : [];
 
   return (
     <AppShell>
@@ -30,6 +36,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
           <DocumentEditorWorkspace
             documentId={document.id}
             initialContent={document.content}
+            initialEvents={initialEvents}
           />
         </div>
       ) : (

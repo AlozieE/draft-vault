@@ -34,7 +34,13 @@ export function DocumentDashboard({
     try {
       const document = await createDocument("Untitled Document");
       setDocuments((current) => [
-        { ...document, eventCount: 0 },
+        {
+          id: document.id,
+          title: document.title,
+          createdAt: document.createdAt,
+          updatedAt: document.updatedAt,
+          eventCount: 0,
+        },
         ...current,
       ]);
     } finally {

@@ -89,18 +89,26 @@ export async function createEventHash(
   return createSha256Hash(JSON.stringify(getHashableEventData(event)));
 }
 
+type VerifyEventChainOptions = {
+  validateGenesisLink?: boolean;
+};
+
 export async function verifyEventChain(
   events: WritingEvent[],
+  options: VerifyEventChainOptions = {},
 ): Promise<boolean> {
+  const { validateGenesisLink = true } = options;
+
   if (events.length === 0) {
     return true;
   }
 
   for (const [index, event] of events.entries()) {
-    const expectedPreviousHash =
-      index === 0 ? GENESIS_HASH : events[index - 1]!.eventHash;
-
-    if (event.previousHash !== expectedPreviousHash) {
+    if (index === 0) {
+      if (validateGenesisLink && event.previousHash !== GENESIS_HASH) {
+        return false;
+      }
+    } else if (event.previousHash !== events[index - 1]!.eventHash) {
       return false;
     }
 

@@ -35,6 +35,19 @@ export async function getWritingEvents(
   return mapWritingEventRecordsToWritingEvents(events);
 }
 
+export async function getRecentWritingEvents(
+  documentId: string,
+  limit = 50,
+): Promise<WritingEvent[]> {
+  const events = await prisma.writingEvent.findMany({
+    where: { documentId },
+    orderBy: [{ timestamp: "desc" }, { createdAt: "desc" }],
+    take: limit,
+  });
+
+  return mapWritingEventRecordsToWritingEvents(events.reverse());
+}
+
 export async function createWritingEventRecord(
   input: CreateWritingEventRecordInput,
 ): Promise<WritingEvent> {
