@@ -37,6 +37,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
             documentId={document.id}
             initialContent={document.content}
             initialEvents={initialEvents}
+            isDemoDocument={id === "demo"}
           />
         </div>
       ) : (

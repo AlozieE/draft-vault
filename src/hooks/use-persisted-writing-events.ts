@@ -164,17 +164,28 @@ export function usePersistedWritingEvents(
     [addWritingEvents],
   );
 
-  const clearEvents = useCallback(() => {
-    chainQueueRef.current = chainQueueRef.current.then(async () => {
+  const clearEvents = useCallback(async (): Promise<boolean> => {
+    let succeeded = false;
+
+    await (chainQueueRef.current = chainQueueRef.current.then(async () => {
       try {
-        await clearWritingEventsFromDb(documentId);
+        const result = await clearWritingEventsFromDb(documentId);
+
+        if (!result.success) {
+          console.error("Failed to clear writing events:", result.error);
+          return;
+        }
+
         eventsRef.current = [];
         setEvents([]);
         setChainIsValid(true);
+        succeeded = true;
       } catch (error: unknown) {
         console.error("Failed to clear writing events:", error);
       }
-    });
+    }));
+
+    return succeeded;
   }, [documentId]);
 
   const latestEvent = useMemo(

@@ -23,7 +23,7 @@ const EMPTY_EVENT_COUNTS: Record<WritingEventType, number> = {
 };
 
 function formatTimestamp(timestamp: string): string {
-  return new Date(timestamp).toLocaleString(undefined, {
+  return new Date(timestamp).toLocaleString("en-US", {
     dateStyle: "medium",
     timeStyle: "short",
   });

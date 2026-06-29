@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
+
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ClientFormattedTime } from "@/components/ui/client-formatted-time";
 import {
   Card,
   CardContent,
@@ -14,16 +16,8 @@ type WritingTimelineProps = {
   events: WritingEvent[];
   chainIsValid: boolean;
   isLoading?: boolean;
-  onClear?: () => void;
+  deleteEventsControl?: ReactNode;
 };
-
-function formatLocalTime(timestamp: string): string {
-  return new Date(timestamp).toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-}
 
 function formatContentLengthChange(change: number): string {
   if (change > 0) {
@@ -41,7 +35,7 @@ export function WritingTimeline({
   events,
   chainIsValid,
   isLoading = false,
-  onClear,
+  deleteEventsControl,
 }: WritingTimelineProps) {
   return (
     <Card className="flex h-full min-h-0 flex-col gap-0 overflow-hidden pb-0 pt-(--card-spacing)">
@@ -55,17 +49,7 @@ export function WritingTimeline({
             {chainIsValid ? "Verification passed" : "Verification failed"}
           </Badge>
         </div>
-        {onClear ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={onClear}
-            disabled={isLoading || events.length === 0}
-          >
-            Clear timeline
-          </Button>
-        ) : null}
+        {deleteEventsControl}
       </CardHeader>
       <CardContent className="min-h-0 flex-1 overflow-y-auto pb-(--card-spacing)">
         {isLoading ? (
@@ -81,9 +65,10 @@ export function WritingTimeline({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-2">
                     <Badge variant="outline">{event.type}</Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {formatLocalTime(event.timestamp)}
-                    </span>
+                    <ClientFormattedTime
+                      timestamp={event.timestamp}
+                      className="text-xs text-muted-foreground"
+                    />
                   </div>
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                     <span>
