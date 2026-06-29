@@ -12,7 +12,6 @@ import {
 import { usePersistedWritingEvents } from "@/hooks/use-persisted-writing-events";
 import {
   DELETE_WRITING_EVENTS_DESCRIPTION,
-  DEMO_TIMELINE_DELETE_LABEL,
   RECORDED_EVENTS_DELETE_LABEL,
 } from "@/lib/audit-log";
 import type { WritingEvent, WritingEventInput } from "@/types/writing-event";
@@ -21,14 +20,12 @@ type DocumentEditorWorkspaceProps = {
   documentId: string;
   initialContent?: string;
   initialEvents?: WritingEvent[];
-  isDemoDocument?: boolean;
 };
 
 export function DocumentEditorWorkspace({
   documentId,
   initialContent,
   initialEvents,
-  isDemoDocument = false,
 }: DocumentEditorWorkspaceProps) {
   const { autosaveStatus, handleContentChange } =
     useDocumentAutosave(documentId);
@@ -58,10 +55,6 @@ export function DocumentEditorWorkspace({
     [clearEvents, documentId],
   );
 
-  const deleteEventsLabel = isDemoDocument
-    ? DEMO_TIMELINE_DELETE_LABEL
-    : RECORDED_EVENTS_DELETE_LABEL;
-
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
       <p className="shrink-0 text-sm text-muted-foreground">
@@ -84,7 +77,7 @@ export function DocumentEditorWorkspace({
             deleteEventsControl={
               <DeleteEventsDialog
                 documentId={documentId}
-                label={deleteEventsLabel}
+                label={RECORDED_EVENTS_DELETE_LABEL}
                 description={DELETE_WRITING_EVENTS_DESCRIPTION}
                 onConfirm={handleDeleteEvents}
                 disabled={isLoading || events.length === 0}

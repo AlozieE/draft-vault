@@ -5,9 +5,7 @@ import { APP_NAME } from "@/lib/constants";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/documents/demo", label: "Editor Demo" },
-  { href: "/replay/demo", label: "Replay" },
-  { href: "/report/demo", label: "Report" },
+  { href: "/sample-report", label: "Sample report" },
 ] as const;
 
 export function AppSidebar() {

@@ -50,10 +50,10 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center justify-center gap-3">
             <SignInCta />
             <Button asChild>
-              <Link href="/dashboard">Open Dashboard</Link>
+              <Link href="/dashboard">Start writing</Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="/documents/demo">View Demo</Link>
+              <Link href="/sample-report">View sample report</Link>
             </Button>
           </div>
         </section>
